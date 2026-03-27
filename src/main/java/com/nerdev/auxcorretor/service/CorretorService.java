@@ -3,7 +3,10 @@ package com.nerdev.auxcorretor.service;
 import com.nerdev.auxcorretor.model.Corretor;
 import com.nerdev.auxcorretor.repository.CorretorRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 
 @Service
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class CorretorService {
 
     private final CorretorRepository corretorRepository;
+    private final PasswordEncoder encoder;
 
     public Corretor salvar(Corretor corretor){
         // todo: adicionar validator
@@ -20,6 +24,7 @@ public class CorretorService {
         if(corretorRepository.existsByEmail(corretor.getEmail())){
             throw new IllegalArgumentException("Email já cadastrado!");
         }
+        criptografarSenhaSeNescessario(corretor);
         return corretorRepository.save(corretor);
     }
 
@@ -35,6 +40,7 @@ public class CorretorService {
         if (!corretorRepository.existsById(corretor.getId())){
             throw new IllegalArgumentException("Corretor não encontrado para atualizar");
         }
+        criptografarSenhaSeNescessario(corretor);
         corretorRepository.save(corretor);
     }
 
@@ -46,4 +52,12 @@ public class CorretorService {
         corretor.setAtivo(false);
         corretorRepository.save(corretor);
     }
+
+    private void criptografarSenhaSeNescessario(Corretor corretor){
+        String senha = corretor.getSenha();
+        if (senha != null && senha.startsWith("{")){
+            corretor.setSenha(encoder.encode(senha));
+        }
+    }
+
 }
