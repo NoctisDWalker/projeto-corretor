@@ -26,12 +26,11 @@ public class CorretorValidator {
 
     public void validarAtualizar(Corretor corretor) {
         verificarCamposObrigatorios(corretor);
-        verificarSeExistePorId(corretor.getId());
         verificarEmailDuplicado(corretor);
     }
 
     public void validarDeletar(UUID id) {
-        verificarSeExistePorId(id);
+       // Todo: implementar validação com outras entidades
     }
 
     private void verificarCamposObrigatorios(Corretor corretor) {
@@ -47,16 +46,6 @@ public class CorretorValidator {
         }
         if (emailExistente.isPresent() && !emailExistente.get().getId().equals(corretor.getId())){
             throw new DuplicateEntityException("Dados informados já estão em uso.");
-        }
-    }
-
-    private void verificarSeExistePorId(UUID id) {
-        boolean idExistente = corretorRepository.existsById(id);
-        if (id == null) {
-            throw new BusinessException("ID deve ser informado.");
-        }
-        if(!idExistente){
-            throw new BusinessException("ID não encontrado no banco.");
         }
     }
 
