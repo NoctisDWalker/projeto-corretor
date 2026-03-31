@@ -6,18 +6,21 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "corretor")
+@Table(name = "cliente")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class Corretor {
+public class Cliente {
+
+    /**
+     * Todo: Adicionar Posteriormente Lista de Imoveis
+     */
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,27 +29,24 @@ public class Corretor {
     @Column(nullable = false)
     private String nome;
 
-    @Column(unique = true, nullable = false)
-    private String email;
-
-    @ToString.Exclude
-    @Column(nullable = false)
-    private String senha;
-
     @Column
     private String telefone;
 
+    @Column
+    private String email;
+
+    @Column
+    private String observacoes;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String creci;
+    private StatusClienteEnum statusCliente;
 
-    @Builder.Default
     @Column(nullable = false)
-    private boolean ativo = true;
-
-    @OneToMany(mappedBy = "corretor")
-    private List<Cliente> clientes;
-
-    @Column(nullable = false, updatable = false)
     @CreatedDate
     private LocalDate dataCadastro;
+
+    @JoinColumn(name = "corretor_id",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Corretor corretor;
 }
