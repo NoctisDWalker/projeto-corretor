@@ -7,7 +7,7 @@ import com.nerdev.auxcorretor.model.Corretor;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-@Mapper
+@Mapper(componentModel = "Spring")
 public interface CorretorMapper {
     Corretor toEntity(CorretorCreateRequestDTO dto);
     void updateEntity(@MappingTarget Corretor Entity, CorretorUpdateRequestDTO dto);
