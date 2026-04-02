@@ -4,13 +4,13 @@ import com.nerdev.auxcorretor.model.StatusClienteEnum;
 
 import java.util.UUID;
 
-public record ClientResponseDTO(
+public record ClienteResponseDTO(
         UUID id,
         String nome,
         String telefone,
         String email,
         String observacoes,
         StatusClienteEnum statusCliente,
-        UUID corretor
+        UUID idCorretor
 ) {
 }

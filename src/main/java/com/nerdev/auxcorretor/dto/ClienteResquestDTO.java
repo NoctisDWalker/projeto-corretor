@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-public record ClientResquestDTO(
+public record ClienteResquestDTO(
         @NotBlank
         String nome,
         @NotBlank
@@ -19,7 +19,7 @@ public record ClientResquestDTO(
         @NotNull
         StatusClienteEnum statusCliente,
         @NotNull
-        UUID corretor
+        UUID idCorretor
 ) {
 
 }
