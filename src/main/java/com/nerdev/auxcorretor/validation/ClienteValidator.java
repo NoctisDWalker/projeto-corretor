@@ -4,7 +4,7 @@ import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.exception.DuplicateEntityException;
 import com.nerdev.auxcorretor.exception.RequiredFieldException;
 import com.nerdev.auxcorretor.model.Cliente;
-import com.nerdev.auxcorretor.model.StatusClienteEnum;
+import com.nerdev.auxcorretor.model.enums.StatusClienteEnum;
 import com.nerdev.auxcorretor.repository.ClienteRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;

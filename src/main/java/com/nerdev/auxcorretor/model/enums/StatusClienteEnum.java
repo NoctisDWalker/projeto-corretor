@@ -1,4 +1,4 @@
-package com.nerdev.auxcorretor.model;
+package com.nerdev.auxcorretor.model.enums;
 
 public enum StatusClienteEnum {
     LEAD,

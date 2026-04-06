@@ -26,6 +26,9 @@ public class Corretor {
     @Column(nullable = false)
     private String nome;
 
+    @Column
+    private String cpf;
+
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -43,8 +46,8 @@ public class Corretor {
     @Column(nullable = false)
     private boolean ativo = true;
 
-    @OneToMany(mappedBy = "corretor")
-    private List<Cliente> clientes;
+    @OneToMany(mappedBy = "corretor", fetch = FetchType.LAZY)
+    private List<Atendimento> atendimentos;
 
     @Column(nullable = false, updatable = false)
     @CreatedDate

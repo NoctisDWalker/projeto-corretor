@@ -1,5 +1,6 @@
 package com.nerdev.auxcorretor.model;
 
+import com.nerdev.auxcorretor.model.enums.StatusClienteEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -36,6 +37,9 @@ public class Cliente {
     private String email;
 
     @Column
+    private String cpf;
+
+    @Column
     private String observacoes;
 
     @Enumerated(EnumType.STRING)
@@ -46,7 +50,4 @@ public class Cliente {
     @CreatedDate
     private LocalDate dataCadastro;
 
-    @JoinColumn(name = "corretor_id",nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Corretor corretor;
 }

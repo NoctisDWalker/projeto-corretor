@@ -6,7 +6,7 @@ import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.mapper.ClienteMapper;
 import com.nerdev.auxcorretor.model.Cliente;
 import com.nerdev.auxcorretor.model.Corretor;
-import com.nerdev.auxcorretor.model.StatusClienteEnum;
+import com.nerdev.auxcorretor.model.enums.StatusClienteEnum;
 import com.nerdev.auxcorretor.repository.ClienteRepository;
 import com.nerdev.auxcorretor.repository.CorretorRepository;
 import com.nerdev.auxcorretor.validation.ClienteValidator;

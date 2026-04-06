@@ -1,6 +1,6 @@
 package com.nerdev.auxcorretor.dto;
 
-import com.nerdev.auxcorretor.model.StatusClienteEnum;
+import com.nerdev.auxcorretor.model.enums.StatusClienteEnum;
 
 import java.util.UUID;
 
