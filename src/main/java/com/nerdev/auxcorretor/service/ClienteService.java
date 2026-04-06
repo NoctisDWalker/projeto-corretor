@@ -29,8 +29,8 @@ public class ClienteService {
                 .orElseThrow(() -> new BusinessException("Corretor não encontrado"));
 
         Cliente cliente = clienteMapper.toEntity(dto);
-        clienteValidator.validaSalvar(cliente);
         cliente.setCorretor(corretorEncontrado);
+        clienteValidator.validaSalvar(cliente);
         Cliente clienteSalvo = clienteRepository.save(cliente);
         return clienteMapper.toDto(clienteSalvo);
     }
