@@ -1,36 +1,22 @@
 package com.nerdev.auxcorretor.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import org.hibernate.validator.constraints.br.CPF;
 
 @Schema
-public record CorretorCreateRequestDTO(
-
+public record AtualizaSenhaDTO(
         @NotBlank(message = "Campo obrigatorio")
-        String nome,
+        String senhaAtual,
 
         @NotBlank(message = "Campo obrigatorio")
         @Pattern(
                 regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
                 message = "A senha deve conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial"
         )
-        String senha,
+        String novaSenha,
 
         @NotBlank(message = "Campo obrigatorio")
-        @CPF
-        String cpf,
-
-        @NotBlank(message = "Campo obrigatorio")
-        @Email
-        String email,
-
-        String telefone,
-
-        @NotBlank(message = "Campo obrigatorio")
-        String creci
-
+        String confirmacaoSenha
 ) {
 }

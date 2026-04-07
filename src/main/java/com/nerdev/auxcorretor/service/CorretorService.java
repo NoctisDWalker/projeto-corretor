@@ -42,10 +42,13 @@ public class CorretorService {
         Corretor corretorEncontrado = corretorRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Corretor não encontrado"));
 
+        String cpf = corretorEncontrado.getCpf();
         corretorMapper.updateEntity(corretorEncontrado, dto);
         corretorValidator.validarAtualizar(corretorEncontrado);
+        if(!corretorEncontrado.getCpf().equals(cpf)){
+            throw new BusinessException("CPF não pode ser alterado");
+        }
         Corretor corretorSalvo = corretorRepository.save(corretorEncontrado);
-
         return corretorMapper.toResponseDTO(corretorSalvo);
     }
 
@@ -58,6 +61,31 @@ public class CorretorService {
         corretorValidator.validarDeletar(id);
         corretor.setAtivo(false);
         corretorRepository.save(corretor);
+    }
+
+    public void reativarCorretor(UUID id){
+        Corretor corretorEncontrado = corretorRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Corretor não encontrado"));
+        if(corretorEncontrado.isAtivo()){
+           throw new BusinessException("Somente corretores inativos podem ser reativados");
+        }
+        corretorEncontrado.setAtivo(true);
+        corretorRepository.save(corretorEncontrado);
+    }
+
+    public void trocarSenhaComSenhaAtual(UUID idCorretor, String senhaAtual, String novaSenha, String confirmacaoSenha){
+       // Todo: Adicionar autenticação com usuario logado
+
+        Corretor corretorEncontrado = corretorRepository.findById(idCorretor)
+                .orElseThrow(() -> new BusinessException("Corretor não encontrado"));
+        corretorValidator.validarSenha(corretorEncontrado, senhaAtual, novaSenha, confirmacaoSenha);
+        corretorEncontrado.setSenha(novaSenha);
+        criptografarSenhaSeNescessario(corretorEncontrado);
+        corretorRepository.save(corretorEncontrado);
+    }
+
+    public void esqueceuASenha(){
+        // TODO: Implementar futuramente
     }
 
     private void criptografarSenhaSeNescessario(Corretor corretor){
