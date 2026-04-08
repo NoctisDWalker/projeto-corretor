@@ -19,54 +19,54 @@ public class ClienteValidator {
 
     public void validaSalvar(Cliente cliente) {
         verificarCamposObrigatorios(cliente);
-        verificarStatusInicial(cliente);
         verificarEmailDuplicado(cliente);
+        verificarCpfDuplicado(cliente);
     }
 
     public void validaAtualizar(Cliente cliente) {
-        verificarCamposObrigatorios(cliente);
-        verificarStatusAtual(cliente);
         verificarEmailDuplicado(cliente);
+        verificarCpfDuplicado(cliente);
     }
 
     public void validaDeletar(Cliente cliente) {
+        // Todo: Não permitir exclusão de clientes com vendas concretizadas
         verificarStatusAtual(cliente);
     }
 
-
     private void verificarEmailDuplicado(Cliente cliente) {
         Optional<Cliente> clienteEncontrado = clienteRepository
-                .findByEmailAndCorretorId(cliente.getEmail(), cliente.getCorretor().getId());
+                .findByEmail(cliente.getEmail());
+        validaUnico(clienteEncontrado, cliente);
+    }
+    private void verificarCpfDuplicado(Cliente cliente) {
+        Optional<Cliente> clienteEncontrado = clienteRepository
+                .findByCpf(cliente.getCpf());
+        validaUnico(clienteEncontrado, cliente);
+    }
 
+    private void verificarCamposObrigatorios(Cliente cliente) {
+        if (isNullOrBlank(cliente.getNome()) || isNullOrBlank(cliente.getTelefone())){
+            throw new RequiredFieldException("Campos obrigatórios não informados.");
+        }
+    }
+
+    private void verificarStatusAtual(Cliente cliente) {
+        if (cliente.getStatusCliente() == StatusClienteEnum.INATIVO) {
+            throw new BusinessException("Cliente já está inativo.");
+        }
+    }
+
+    private boolean isNullOrBlank(String campo) {
+        return (campo == null || campo.isBlank());
+    }
+
+    private void validaUnico(Optional<Cliente> clienteEncontrado, Cliente cliente){
         if (cliente.getId() == null && clienteEncontrado.isPresent()) {
             throw new DuplicateEntityException("Dados informados já estão em uso.");
         }
         if (clienteEncontrado.isPresent() && !clienteEncontrado.get().getId().equals(cliente.getId())) {
             throw new DuplicateEntityException("Dados informados já estão em uso.");
         }
-
-    }
-
-    private void verificarCamposObrigatorios(Cliente cliente) {
-        if (isNullOrBlank(cliente.getNome()) || isNullOrBlank(cliente.getEmail()) ||
-                isNullOrBlank(cliente.getTelefone()) || cliente.getStatusCliente() == null || cliente.getCorretor() == null){
-            throw new RequiredFieldException("Campos obrigatórios não informados.");
-        }
-    }
-
-    private void verificarStatusInicial(Cliente cliente) {
-        if (cliente.getStatusCliente() == StatusClienteEnum.PERDIDO) {
-            throw new BusinessException("Status do cliente invalido para criação");
-        }
-    }
-    private void verificarStatusAtual(Cliente cliente) {
-        if (cliente.getStatusCliente() == StatusClienteEnum.PERDIDO) {
-            throw new BusinessException("Status do cliente invalido para alteração ou deleção");
-        }
-    }
-
-    private boolean isNullOrBlank(String campo) {
-        return (campo == null || campo.isBlank());
     }
 
 }

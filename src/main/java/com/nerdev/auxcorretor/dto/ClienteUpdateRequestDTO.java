@@ -1,16 +1,15 @@
 package com.nerdev.auxcorretor.dto;
 
 import com.nerdev.auxcorretor.model.enums.StatusClienteEnum;
+import jakarta.validation.constraints.Email;
 
-import java.util.UUID;
-
-public record ClienteResponseDTO(
-        UUID id,
+public record ClienteUpdateRequestDTO(
         String nome,
-        String cpf,
         String telefone,
+        @Email
         String email,
         String observacoes,
         StatusClienteEnum statusCliente
 ) {
+
 }

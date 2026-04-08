@@ -4,6 +4,7 @@ import com.nerdev.auxcorretor.model.enums.StatusClienteEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
@@ -18,10 +19,6 @@ import java.util.UUID;
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 public class Cliente {
-
-    /**
-     * Todo: Adicionar Posteriormente Lista de Imoveis
-     */
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -49,5 +46,9 @@ public class Cliente {
     @Column(nullable = false)
     @CreatedDate
     private LocalDate dataCadastro;
+
+    @Column
+    @LastModifiedDate
+    private LocalDate dataAtualizacao;
 
 }

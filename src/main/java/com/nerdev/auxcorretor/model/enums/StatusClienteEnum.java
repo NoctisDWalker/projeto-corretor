@@ -1,10 +1,10 @@
 package com.nerdev.auxcorretor.model.enums;
 
 public enum StatusClienteEnum {
-    LEAD,
-    INTERESSADO,
-    VISITA_AGENDADA,
-    PROPOSTA,
-    CLIENTE,
-    PERDIDO
+    ATIVO,
+    INATIVO,
+    CLIENTE_ANTIGO,
+    CLIENTE_RECENTE,
+    SEM_ALTERACAO_LONGO_TEMPO,
+    BLOQUEADO
 }
