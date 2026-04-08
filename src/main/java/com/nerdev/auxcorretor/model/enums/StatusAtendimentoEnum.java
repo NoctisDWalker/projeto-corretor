@@ -2,12 +2,30 @@ package com.nerdev.auxcorretor.model.enums;
 
 public enum StatusAtendimentoEnum {
 
-    NOVO,
-    EM_CONTATO,
-    VISITA_AGENDADA,
-    PROPOSTA_ENVIADA,
-    NEGOCIANDO,
-    FECHADO,
-    PERDIDO
+    NOVO_LEAD(false),
+    PRIMEIRO_CONTATO(false),
+    EM_ATENDIMENTO(false),
+    VISITA_AGENDADA(false),
+    VISITA_REALIZADA(false),
+    PROPOSTA_ENVIADA(false),
+    NEGOCIANDO(false),
+
+    VENDA_CONCLUIDA(true),
+    PERDIDO(true),
+    INATIVO(true);
+
+    private final boolean finalizado;
+
+    StatusAtendimentoEnum(boolean finalizado){
+        this.finalizado = finalizado;
+    }
+
+    public boolean isFinalizado() {
+        return finalizado;
+    }
+
+    public boolean isAtivo() {
+        return !finalizado;
+    }
 
 }

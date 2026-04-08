@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,14 +56,14 @@ public class Atendimento {
     private String observacoes;
 
     @Column
-    private LocalDate dataFim;
+    private LocalDateTime dataFim;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDate dataCadastro;
+    private LocalDateTime dataCadastro;
 
     @LastModifiedDate
     @Column(nullable = false)
-    private LocalDate dataAtualizacao;
+    private LocalDateTime dataAtualizacao;
 
 }
