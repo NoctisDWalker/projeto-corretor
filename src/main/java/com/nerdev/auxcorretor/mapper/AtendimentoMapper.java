@@ -18,6 +18,8 @@ public interface AtendimentoMapper {
 
     @Mapping(target = "cliente", ignore = true)
     @Mapping(target = "corretor", ignore = true)
+    @Mapping(target = "statusAtendimento",source = "status")
+    @Mapping(target = "visitas", ignore = true)
     void updateEntity(@MappingTarget Atendimento entity, AtendimentoUpdateRequestDTO dto);
 
     @Mapping(source = "cliente.id", target = "idCliente")
