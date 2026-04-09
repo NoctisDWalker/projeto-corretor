@@ -1,5 +1,7 @@
 package com.nerdev.auxcorretor.model.enums;
 
+import java.util.List;
+
 public enum StatusAtendimentoEnum {
 
     NOVO_LEAD(false),
@@ -26,6 +28,10 @@ public enum StatusAtendimentoEnum {
 
     public boolean isAtivo() {
         return !finalizado;
+    }
+
+    public static List<StatusAtendimentoEnum> statusFinais(){
+        return List.of(VENDA_CONCLUIDA, PERDIDO, INATIVO);
     }
 
 }
