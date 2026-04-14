@@ -52,9 +52,9 @@ public class AtendimentoService {
         Atendimento atendimentoEncontrado = atendimentoRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Atendimento não encontrado"));
 
+        atendimentoValidator.validaAtualizar(atendimentoEncontrado);
         StatusAtendimentoEnum statusAnterior = atendimentoEncontrado.getStatusAtendimento();
         atendimentoMapper.updateEntity(atendimentoEncontrado, updateDTO);
-        atendimentoValidator.validaAtualizar(atendimentoEncontrado);
         regraDataFim(atendimentoEncontrado, statusAnterior);
         Atendimento atualizado = atendimentoRepository.save(atendimentoEncontrado);
 
