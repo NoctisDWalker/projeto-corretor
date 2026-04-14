@@ -7,9 +7,9 @@ import java.util.UUID;
 
 @Schema
 public record VisitaCreateRequestDTO(
-        UUID atendimento,
-        UUID imovel,
-        LocalDateTime dataHoraAgenda,
+        UUID idAtendimento,
+        UUID idImovel,
+        LocalDateTime dataHoraAgendada,
         String observacoes
 ) {
 }

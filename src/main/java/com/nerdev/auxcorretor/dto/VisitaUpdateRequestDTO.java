@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Schema
 public record VisitaUpdateRequestDTO(
-        LocalDateTime dataHoraAgenda,
+        LocalDateTime dataHoraAgendada,
         LocalDateTime dataHoraRealizada,
         StatusVisitaEnum statusVisita,
         InteresseClienteEnum interesseCliente,

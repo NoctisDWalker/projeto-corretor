@@ -9,8 +9,8 @@ import java.util.UUID;
 
 public record VisitaResponseDTO(
         UUID id,
-        UUID atendimento,
-        UUID imovel,
+        UUID idAtendimento,
+        UUID idImovel,
         LocalDateTime dataHoraAgenda,
         LocalDateTime dataHoraRealizada,
         StatusVisitaEnum statusVisita,
