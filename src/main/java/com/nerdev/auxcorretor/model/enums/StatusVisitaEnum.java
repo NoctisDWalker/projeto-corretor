@@ -1,6 +1,7 @@
 package com.nerdev.auxcorretor.model.enums;
 
 import java.util.List;
+import java.util.Set;
 
 public enum StatusVisitaEnum {
 
@@ -12,8 +13,9 @@ public enum StatusVisitaEnum {
     NAO_COMPARECEU(true);
 
     private final boolean finalizado;
+    private Set<StatusVisitaEnum> proximosStatus;
 
-    StatusVisitaEnum(boolean finalizado){
+    StatusVisitaEnum(boolean finalizado) {
         this.finalizado = finalizado;
     }
 
@@ -25,8 +27,32 @@ public enum StatusVisitaEnum {
         return !finalizado;
     }
 
-    public static List<StatusVisitaEnum> statusFinais(){
+    public static List<StatusVisitaEnum> statusFinais() {
         return List.of(REALIZADA, CANCELADA, NAO_COMPARECEU);
     }
 
+    static {
+        AGENDADA.proximosStatus = Set.of(CONFIRMADA, CANCELADA);
+
+        CONFIRMADA.proximosStatus = Set.of(
+                REMARCADA,
+                REALIZADA,
+                CANCELADA,
+                NAO_COMPARECEU
+                );
+
+        REMARCADA.proximosStatus = Set.of(
+                CONFIRMADA,
+                REALIZADA,
+                CANCELADA
+        );
+
+        REALIZADA.proximosStatus = Set.of();
+        CANCELADA.proximosStatus = Set.of();
+        NAO_COMPARECEU.proximosStatus = Set.of();
+    }
+
+    public boolean podeTransicionarPara(StatusVisitaEnum destino) {
+        return proximosStatus != null && proximosStatus.contains(destino);
+    }
 }
