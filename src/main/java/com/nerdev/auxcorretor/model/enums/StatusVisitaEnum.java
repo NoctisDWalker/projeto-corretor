@@ -47,8 +47,8 @@ public enum StatusVisitaEnum {
                 CANCELADA
         );
 
+        CANCELADA.proximosStatus = Set.of(REMARCADA);
         REALIZADA.proximosStatus = Set.of();
-        CANCELADA.proximosStatus = Set.of();
         NAO_COMPARECEU.proximosStatus = Set.of();
     }
 

@@ -22,6 +22,12 @@ public interface VisitaMapper {
     @Mapping(target = "imovel", ignore = true)
     @Mapping(target = "dataCadastro", ignore = true)
     @Mapping(target = "dataAtualizacao", ignore = true)
+    Visita cloneEntity(VisitaUpdateRequestDTO dto);
+
+    @Mapping(target = "atendimento", ignore = true)
+    @Mapping(target = "imovel", ignore = true)
+    @Mapping(target = "dataCadastro", ignore = true)
+    @Mapping(target = "dataAtualizacao", ignore = true)
     void updateEntity(@MappingTarget Visita entity, VisitaUpdateRequestDTO dto);
 
     @Mapping(source = "atendimento.id", target = "idAtendimento")
