@@ -17,6 +17,14 @@ public interface ImovelMapper {
     @Mapping(target = "dataAtualizacao", ignore = true)
     Imovel toEntity(ImovelCreateRequestDTO dto);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "statusImovel", ignore = true)
+    @Mapping(target = "corretorResponsavel", ignore = true)
+    @Mapping(target = "quantidadeVisitas", ignore = true)
+    @Mapping(target = "dataCadastro", ignore = true)
+    @Mapping(target = "dataAtualizacao", ignore = true)
+    Imovel cloneEntity(ImovelUpdateRequestDTO dto);
+
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(@MappingTarget Imovel entity, ImovelUpdateRequestDTO dto);
 
