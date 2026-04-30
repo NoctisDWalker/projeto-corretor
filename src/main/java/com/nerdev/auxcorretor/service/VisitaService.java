@@ -85,7 +85,7 @@ public class VisitaService {
 
         validaRelacionamentoVisitaAtendimento(atendimentoEncontrado, visitaEncontrada);
         visitaValidator.validaReativar(visitaEncontrada);
-        visitaEncontrada.setStatusVisita(StatusVisitaEnum.REMARCADA);
+        visitaEncontrada.setStatusVisita(StatusVisitaEnum.AGENDADA);
 
         visitaRepository.save(visitaEncontrada);
     }

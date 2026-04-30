@@ -4,9 +4,7 @@ import com.nerdev.auxcorretor.dto.VisitaCreateRequestDTO;
 import com.nerdev.auxcorretor.dto.VisitaResponseDTO;
 import com.nerdev.auxcorretor.dto.VisitaUpdateRequestDTO;
 import com.nerdev.auxcorretor.model.Visita;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "Spring")
 public interface VisitaMapper {
@@ -28,6 +26,7 @@ public interface VisitaMapper {
     @Mapping(target = "imovel", ignore = true)
     @Mapping(target = "dataCadastro", ignore = true)
     @Mapping(target = "dataAtualizacao", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(@MappingTarget Visita entity, VisitaUpdateRequestDTO dto);
 
     @Mapping(source = "atendimento.id", target = "idAtendimento")
