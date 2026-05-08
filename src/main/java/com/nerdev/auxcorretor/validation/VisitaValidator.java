@@ -6,6 +6,7 @@ import com.nerdev.auxcorretor.model.Visita;
 import com.nerdev.auxcorretor.model.enums.StatusVisitaEnum;
 import com.nerdev.auxcorretor.repository.VisitaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -39,7 +40,7 @@ public class VisitaValidator {
 
     public void validaCancelar(Visita visita) {
         validaStatusAtendimento(visita.getAtendimento());
-        if (!visita.getStatusVisita().podeTransicionarPara(StatusVisitaEnum.CANCELADA)){
+        if (!visita.getStatusVisita().podeTransicionarPara(StatusVisitaEnum.CANCELADA)) {
             throw new BusinessException("Visita não pode ser cancelada no status atual.");
         }
     }
@@ -103,8 +104,15 @@ public class VisitaValidator {
 
         StatusVisitaEnum statusAtual = visitaPersistida.getStatusVisita();
         StatusVisitaEnum statusNovo = visitaAtualizada.getStatusVisita();
+        StatusVisitaEnum statusFinal = visitaAtualizada.getStatusVisita() != null
+                ? visitaAtualizada.getStatusVisita() : visitaPersistida.getStatusVisita();
 
-        if (statusNovo == null || statusNovo.equals(statusAtual)) {
+        LocalDateTime dataHoraAgendadaFinal = visitaAtualizada.getDataHoraAgendada() != null
+                ? visitaAtualizada.getDataHoraAgendada() : visitaPersistida.getDataHoraAgendada();
+        LocalDateTime dataHoraRealizadaFinal = visitaAtualizada.getDataHoraRealizada() != null
+                ? visitaAtualizada.getDataHoraRealizada() : visitaPersistida.getDataHoraRealizada();
+
+        if (statusFinal.equals(statusAtual)) {
             return;
         }
 
@@ -112,19 +120,19 @@ public class VisitaValidator {
             throw new BusinessException("Não é permitido alterar status de " + statusAtual + " para " + statusNovo);
         }
 
-        if (statusNovo.isFinalizado()) {
-            validaDataHoraRealizada(visitaAtualizada, visitaAtualizada.getDataHoraRealizada());
+        if (statusFinal.isFinalizado()) {
+            validaDataHoraRealizada(dataHoraAgendadaFinal, dataHoraRealizadaFinal);
         }
     }
 
-    private void validaDataHoraRealizada(Visita visita, LocalDateTime dataHoraRealizada) {
-        if (visita.getDataHoraRealizada() == null) {
+    private void validaDataHoraRealizada(LocalDateTime dataHoraAgendada, LocalDateTime dataHoraRealizada) {
+        if (dataHoraRealizada == null) {
             throw new BusinessException("A Data/Hora realizada, deve ser informada");
         }
         if (dataHoraRealizada.isAfter(LocalDateTime.now())) {
             throw new BusinessException("A Data/Hora realizada, deve ser anterior ao momento atual");
         }
-        if (dataHoraRealizada.isBefore(visita.getDataHoraAgendada())) {
+        if (dataHoraRealizada.isBefore(dataHoraAgendada)) {
             throw new BusinessException("A Data/Hora realizada, deve ser posterior a data/hora da visita agendada");
         }
     }

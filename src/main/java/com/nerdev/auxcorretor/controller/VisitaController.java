@@ -1,16 +1,17 @@
 package com.nerdev.auxcorretor.controller;
 
-import com.nerdev.auxcorretor.dto.VisitaCreateRequestDTO;
-import com.nerdev.auxcorretor.dto.VisitaResponseDTO;
-import com.nerdev.auxcorretor.dto.VisitaUpdateRequestDTO;
+import com.nerdev.auxcorretor.dto.*;
+import com.nerdev.auxcorretor.model.historicos.HistoricoVisita;
 import com.nerdev.auxcorretor.service.VisitaService;
 import com.nerdev.auxcorretor.web.util.RestLocationBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -41,7 +42,7 @@ public class VisitaController {
 
     @DeleteMapping("/{idVisita}")
     ResponseEntity<Void> removerVisita(@PathVariable UUID idVisita,
-                                                    @PathVariable UUID idAtendimento) {
+                                       @PathVariable UUID idAtendimento) {
         visitaService.cancelar(idVisita, idAtendimento);
         return ResponseEntity.noContent().build();
     }
@@ -50,6 +51,26 @@ public class VisitaController {
     public ResponseEntity<Void> reativarVisita(@PathVariable UUID idAtendimento, @PathVariable UUID idVisita) {
         visitaService.reativarVisita(idVisita, idAtendimento);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{idVisita}/historicos")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void adicionarHistoricoManual(@PathVariable UUID idVisita,
+                                         @PathVariable UUID idAtendimento,
+                                         @RequestBody @Valid RegistrarHistoricoVisitaRequestDTO historicoDTO
+    ) {
+
+        visitaService.adicionarHistoricoManual(idVisita, idAtendimento, historicoDTO.descricao());
+
+    }
+
+    @GetMapping("/{idVisita}/historicos")
+    public ResponseEntity<List<HistoricoVisitaResponseDTO>> buscarTimeLine(@PathVariable UUID idVisita,
+                                                                           @PathVariable UUID idAtendimento
+    ) {
+        List<HistoricoVisitaResponseDTO> listaTimeLine = visitaService.buscarTimeLineVisita(idVisita, idAtendimento);
+
+        return ResponseEntity.ok(listaTimeLine);
     }
 
 }

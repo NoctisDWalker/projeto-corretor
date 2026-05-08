@@ -2,6 +2,7 @@ package com.nerdev.auxcorretor.model;
 
 import com.nerdev.auxcorretor.model.enums.InteresseClienteEnum;
 import com.nerdev.auxcorretor.model.enums.StatusVisitaEnum;
+import com.nerdev.auxcorretor.model.historicos.HistoricoVisita;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -10,6 +11,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -56,6 +59,10 @@ public class Visita {
 
     @Column
     private String observacoes;
+
+    @Column
+    @OneToMany(mappedBy = "visita", cascade = CascadeType.ALL,  orphanRemoval = true)
+    private List<HistoricoVisita> historicos = new ArrayList<>();
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
