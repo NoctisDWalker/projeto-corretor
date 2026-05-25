@@ -1,7 +1,6 @@
 package com.nerdev.auxcorretor.controller;
 
-import com.nerdev.auxcorretor.dto.*;
-import com.nerdev.auxcorretor.model.historicos.HistoricoVisita;
+import com.nerdev.auxcorretor.dto.visita.*;
 import com.nerdev.auxcorretor.service.VisitaService;
 import com.nerdev.auxcorretor.web.util.RestLocationBuilder;
 import jakarta.validation.Valid;

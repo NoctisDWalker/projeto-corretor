@@ -1,8 +1,8 @@
 package com.nerdev.auxcorretor.controller;
 
-import com.nerdev.auxcorretor.dto.ImovelCreateRequestDTO;
-import com.nerdev.auxcorretor.dto.ImovelResponseDTO;
-import com.nerdev.auxcorretor.dto.ImovelUpdateRequestDTO;
+import com.nerdev.auxcorretor.dto.imovel.ImovelCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.imovel.ImovelResponseDTO;
+import com.nerdev.auxcorretor.dto.imovel.ImovelUpdateRequestDTO;
 import com.nerdev.auxcorretor.service.ImovelService;
 import com.nerdev.auxcorretor.web.util.RestLocationBuilder;
 import jakarta.validation.Valid;

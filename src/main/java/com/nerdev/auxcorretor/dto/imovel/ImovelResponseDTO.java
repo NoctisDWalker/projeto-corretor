@@ -1,4 +1,4 @@
-package com.nerdev.auxcorretor.dto;
+package com.nerdev.auxcorretor.dto.imovel;
 
 import com.nerdev.auxcorretor.model.enums.FinalidadeImovelEnum;
 import com.nerdev.auxcorretor.model.enums.StatusImovelEnum;
@@ -6,9 +6,12 @@ import com.nerdev.auxcorretor.model.enums.TipoImovelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
 
 @Schema
-public record ImovelUpdateRequestDTO(
+public record ImovelResponseDTO(
+        UUID id,
         String titulo,
         String descricao,
         BigDecimal valor,
@@ -16,7 +19,10 @@ public record ImovelUpdateRequestDTO(
         TipoImovelEnum tipoImovel,
         String cidade,
         String bairro,
-        StatusImovelEnum statusImovel
+        StatusImovelEnum statusImovel,
+        UUID idCorretorResponsavel,
+        int quantidadeVisitas,
+        LocalDate dataCadastro,
+        LocalDate dataAtualizacao
 ) {
-
 }

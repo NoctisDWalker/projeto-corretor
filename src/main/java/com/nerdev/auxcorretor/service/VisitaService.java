@@ -1,9 +1,9 @@
 package com.nerdev.auxcorretor.service;
 
-import com.nerdev.auxcorretor.dto.HistoricoVisitaResponseDTO;
-import com.nerdev.auxcorretor.dto.VisitaCreateRequestDTO;
-import com.nerdev.auxcorretor.dto.VisitaResponseDTO;
-import com.nerdev.auxcorretor.dto.VisitaUpdateRequestDTO;
+import com.nerdev.auxcorretor.dto.visita.HistoricoVisitaResponseDTO;
+import com.nerdev.auxcorretor.dto.visita.VisitaCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.visita.VisitaResponseDTO;
+import com.nerdev.auxcorretor.dto.visita.VisitaUpdateRequestDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.mapper.HistoricoVisitaMapper;
 import com.nerdev.auxcorretor.mapper.VisitaMapper;
@@ -16,7 +16,6 @@ import com.nerdev.auxcorretor.repository.AtendimentoRepository;
 import com.nerdev.auxcorretor.repository.ImovelRepository;
 import com.nerdev.auxcorretor.repository.VisitaRepository;
 import com.nerdev.auxcorretor.validation.VisitaValidator;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

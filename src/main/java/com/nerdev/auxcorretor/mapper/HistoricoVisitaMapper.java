@@ -1,6 +1,6 @@
 package com.nerdev.auxcorretor.mapper;
 
-import com.nerdev.auxcorretor.dto.HistoricoVisitaResponseDTO;
+import com.nerdev.auxcorretor.dto.visita.HistoricoVisitaResponseDTO;
 import com.nerdev.auxcorretor.model.historicos.HistoricoVisita;
 import org.mapstruct.Mapper;
 

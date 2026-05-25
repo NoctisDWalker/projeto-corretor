@@ -1,4 +1,4 @@
-package com.nerdev.auxcorretor.dto;
+package com.nerdev.auxcorretor.dto.corretor;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

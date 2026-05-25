@@ -1,8 +1,8 @@
 package com.nerdev.auxcorretor.mapper;
 
-import com.nerdev.auxcorretor.dto.ImovelCreateRequestDTO;
-import com.nerdev.auxcorretor.dto.ImovelResponseDTO;
-import com.nerdev.auxcorretor.dto.ImovelUpdateRequestDTO;
+import com.nerdev.auxcorretor.dto.imovel.ImovelCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.imovel.ImovelResponseDTO;
+import com.nerdev.auxcorretor.dto.imovel.ImovelUpdateRequestDTO;
 import com.nerdev.auxcorretor.model.Imovel;
 import org.mapstruct.*;
 

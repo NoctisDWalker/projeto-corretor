@@ -1,4 +1,4 @@
-package com.nerdev.auxcorretor.dto;
+package com.nerdev.auxcorretor.dto.atendimento;
 
 import jakarta.validation.constraints.NotNull;
 

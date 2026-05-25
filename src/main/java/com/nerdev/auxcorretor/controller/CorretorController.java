@@ -1,9 +1,9 @@
 package com.nerdev.auxcorretor.controller;
 
-import com.nerdev.auxcorretor.dto.AtualizaSenhaDTO;
-import com.nerdev.auxcorretor.dto.CorretorCreateRequestDTO;
-import com.nerdev.auxcorretor.dto.CorretorResponseDTO;
-import com.nerdev.auxcorretor.dto.CorretorUpdateRequestDTO;
+import com.nerdev.auxcorretor.dto.auth.AtualizaSenhaDTO;
+import com.nerdev.auxcorretor.dto.corretor.CorretorCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.corretor.CorretorResponseDTO;
+import com.nerdev.auxcorretor.dto.corretor.CorretorUpdateRequestDTO;
 import com.nerdev.auxcorretor.service.CorretorService;
 import com.nerdev.auxcorretor.web.util.RestLocationBuilder;
 import jakarta.validation.Valid;

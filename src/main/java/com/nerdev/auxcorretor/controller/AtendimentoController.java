@@ -1,8 +1,8 @@
 package com.nerdev.auxcorretor.controller;
 
-import com.nerdev.auxcorretor.dto.AtendimentoCreateRequestDTO;
-import com.nerdev.auxcorretor.dto.AtendimentoResponseDTO;
-import com.nerdev.auxcorretor.dto.AtendimentoUpdateRequestDTO;
+import com.nerdev.auxcorretor.dto.atendimento.AtendimentoCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.atendimento.AtendimentoResponseDTO;
+import com.nerdev.auxcorretor.dto.atendimento.AtendimentoUpdateRequestDTO;
 import com.nerdev.auxcorretor.service.AtendimentoService;
 import com.nerdev.auxcorretor.web.util.RestLocationBuilder;
 import jakarta.validation.Valid;

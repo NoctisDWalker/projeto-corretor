@@ -1,8 +1,8 @@
 package com.nerdev.auxcorretor.service;
 
-import com.nerdev.auxcorretor.dto.AtendimentoCreateRequestDTO;
-import com.nerdev.auxcorretor.dto.AtendimentoResponseDTO;
-import com.nerdev.auxcorretor.dto.AtendimentoUpdateRequestDTO;
+import com.nerdev.auxcorretor.dto.atendimento.AtendimentoCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.atendimento.AtendimentoResponseDTO;
+import com.nerdev.auxcorretor.dto.atendimento.AtendimentoUpdateRequestDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.mapper.AtendimentoMapper;
 import com.nerdev.auxcorretor.model.Atendimento;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

@@ -1,8 +1,8 @@
 package com.nerdev.auxcorretor.service;
 
-import com.nerdev.auxcorretor.dto.ClienteCreateRequestDTO;
-import com.nerdev.auxcorretor.dto.ClienteResponseDTO;
-import com.nerdev.auxcorretor.dto.ClienteUpdateRequestDTO;
+import com.nerdev.auxcorretor.dto.cliente.ClienteCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.cliente.ClienteResponseDTO;
+import com.nerdev.auxcorretor.dto.cliente.ClienteUpdateRequestDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.mapper.ClienteMapper;
 import com.nerdev.auxcorretor.model.Cliente;

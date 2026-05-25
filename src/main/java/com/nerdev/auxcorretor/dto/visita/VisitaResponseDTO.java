@@ -1,4 +1,4 @@
-package com.nerdev.auxcorretor.dto;
+package com.nerdev.auxcorretor.dto.visita;
 
 import com.nerdev.auxcorretor.model.enums.InteresseClienteEnum;
 import com.nerdev.auxcorretor.model.enums.StatusVisitaEnum;

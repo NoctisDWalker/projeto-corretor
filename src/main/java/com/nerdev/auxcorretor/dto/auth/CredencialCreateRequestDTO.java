@@ -1,4 +1,4 @@
-package com.nerdev.auxcorretor.dto;
+package com.nerdev.auxcorretor.dto.auth;
 
 import com.nerdev.auxcorretor.model.enums.ProviderTypeEnum;
 import jakarta.validation.constraints.NotBlank;

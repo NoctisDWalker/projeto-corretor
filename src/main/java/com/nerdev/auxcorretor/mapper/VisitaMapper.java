@@ -1,8 +1,8 @@
 package com.nerdev.auxcorretor.mapper;
 
-import com.nerdev.auxcorretor.dto.VisitaCreateRequestDTO;
-import com.nerdev.auxcorretor.dto.VisitaResponseDTO;
-import com.nerdev.auxcorretor.dto.VisitaUpdateRequestDTO;
+import com.nerdev.auxcorretor.dto.visita.VisitaCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.visita.VisitaResponseDTO;
+import com.nerdev.auxcorretor.dto.visita.VisitaUpdateRequestDTO;
 import com.nerdev.auxcorretor.model.Visita;
 import org.mapstruct.*;
 

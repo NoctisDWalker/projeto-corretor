@@ -1,4 +1,4 @@
-package com.nerdev.auxcorretor.dto;
+package com.nerdev.auxcorretor.dto.atendimento;
 
 import com.nerdev.auxcorretor.model.enums.StatusAtendimentoEnum;
 import io.swagger.v3.oas.annotations.media.Schema;

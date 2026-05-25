@@ -1,8 +1,8 @@
 package com.nerdev.auxcorretor.service;
 
-import com.nerdev.auxcorretor.dto.CorretorCreateRequestDTO;
-import com.nerdev.auxcorretor.dto.CorretorResponseDTO;
-import com.nerdev.auxcorretor.dto.CorretorUpdateRequestDTO;
+import com.nerdev.auxcorretor.dto.corretor.CorretorCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.corretor.CorretorResponseDTO;
+import com.nerdev.auxcorretor.dto.corretor.CorretorUpdateRequestDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.mapper.CorretorMapper;
 import com.nerdev.auxcorretor.model.Corretor;
