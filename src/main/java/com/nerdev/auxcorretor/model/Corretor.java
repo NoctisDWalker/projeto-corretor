@@ -1,12 +1,15 @@
 package com.nerdev.auxcorretor.model;
 
+import com.nerdev.auxcorretor.exception.BusinessException;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -16,6 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = {"usuario", "corretorContas"})
 @EntityListeners(AuditingEntityListener.class)
 public class Corretor {
 
@@ -23,18 +27,25 @@ public class Corretor {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @JoinColumn(name = "usuario_id", nullable = false)
+    @OneToOne
+    private Usuario usuario;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "corretor", fetch = FetchType.LAZY)
+    private Set<CorretorConta> corretorContas = new HashSet<>();
+
     @Column(nullable = false)
     private String nome;
 
     @Column
     private String cpf;
 
+    @Column
+    private String bio;
+
     @Column(unique = true, nullable = false)
     private String email;
-
-    @ToString.Exclude
-    @Column(nullable = false)
-    private String senha;
 
     @Column
     private String telefone;
@@ -52,4 +63,11 @@ public class Corretor {
     @Column(nullable = false, updatable = false)
     @CreatedDate
     private LocalDate dataCadastro;
+
+    public boolean pertenceAConta(Conta conta) {
+       return corretorContas.stream()
+                .anyMatch(c -> c.getDeletedAt() == null
+                        && c.getConta().getId().equals(conta.getId()));
+    }
+
 }

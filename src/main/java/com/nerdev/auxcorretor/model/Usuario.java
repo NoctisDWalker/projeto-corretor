@@ -31,6 +31,10 @@ public class Usuario {
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Set<CredencialUsuario> credenciais = new HashSet<>();
 
+    @JoinColumn(name = "conta_id",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Conta conta;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     PerfilUsuarioEnum perfilUsuario;
