@@ -6,6 +6,7 @@ import com.nerdev.auxcorretor.exception.RequiredFieldException;
 import com.nerdev.auxcorretor.model.Corretor;
 import com.nerdev.auxcorretor.repository.CorretorRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -13,12 +14,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CorretorValidator {
 
 
     private final CorretorRepository corretorRepository;
-    private final PasswordEncoder encoder;
 
     public void validarCadastro(Corretor corretor) {
         verificarCamposObrigatoriosCadastro(corretor);
@@ -37,21 +37,8 @@ public class CorretorValidator {
        // Todo: implementar validação com outras entidades
     }
 
-    public void validarSenha(Corretor corretor, String senhaAtual, String novaSenha, String confirmacaoSenha){
-        if(isNullOrBlank(senhaAtual) || isNullOrBlank(novaSenha) || isNullOrBlank(confirmacaoSenha)){
-            throw new BusinessException("Não foi possível alterar a senha. Verifique os dados informados.");
-        }
-        boolean senhaAtualValida = encoder.matches(senhaAtual, corretor.getSenha());
-        if(!novaSenha.equals(confirmacaoSenha) || !senhaAtualValida){
-            throw new BusinessException("Não foi possível alterar a senha. Verifique os dados informados.");
-        }
-        if(encoder.matches(novaSenha, corretor.getSenha())){
-            throw new BusinessException("Não foi possível alterar a senha. Verifique os dados informados.");
-        }
-    }
-
     private void verificarCamposObrigatoriosCadastro(Corretor corretor) {
-        if (isNullOrBlank(corretor.getSenha()) || isNullOrBlank(corretor.getEmail()) ||
+        if (isNullOrBlank(corretor.getEmail()) ||
         isNullOrBlank(corretor.getCpf()) || isNullOrBlank(corretor.getCreci())) {
             throw new RequiredFieldException("Campos obrigatórios não informados.");
         }

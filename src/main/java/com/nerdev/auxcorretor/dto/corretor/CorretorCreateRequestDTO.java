@@ -13,15 +13,10 @@ public record CorretorCreateRequestDTO(
         String nome,
 
         @NotBlank(message = "Campo obrigatorio")
-        @Pattern(
-                regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$",
-                message = "A senha deve conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial"
-        )
-        String senha,
-
-        @NotBlank(message = "Campo obrigatorio")
         @CPF
         String cpf,
+
+        String bio,
 
         @NotBlank(message = "Campo obrigatorio")
         @Email

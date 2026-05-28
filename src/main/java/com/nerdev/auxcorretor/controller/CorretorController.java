@@ -50,9 +50,4 @@ public class CorretorController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/senha")
-    public ResponseEntity<Void> atualizarSenha(@PathVariable UUID id, @RequestBody @Valid AtualizaSenhaDTO dto) {
-        corretorService.trocarSenhaComSenhaAtual(id, dto.senhaAtual(), dto.novaSenha(), dto.confirmacaoSenha());
-        return ResponseEntity.noContent().build();
-    }
 }

@@ -9,6 +9,7 @@ import com.nerdev.auxcorretor.model.Corretor;
 import com.nerdev.auxcorretor.repository.CorretorRepository;
 import com.nerdev.auxcorretor.validation.CorretorValidator;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +17,10 @@ import java.util.UUID;
 
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CorretorService {
 
     private final CorretorRepository corretorRepository;
-    private final PasswordEncoder encoder;
     private final CorretorMapper corretorMapper;
     private final CorretorValidator corretorValidator;
 
@@ -30,7 +30,6 @@ public class CorretorService {
         Corretor corretor = corretorMapper.toEntity(dto);
 
         corretorValidator.validarCadastro(corretor);
-        criptografarSenhaSeNescessario(corretor);
         Corretor corretorSalvo = corretorRepository.save(corretor);
 
         return corretorMapper.toResponseDTO(corretorSalvo);
@@ -72,27 +71,4 @@ public class CorretorService {
         corretorEncontrado.setAtivo(true);
         corretorRepository.save(corretorEncontrado);
     }
-
-    public void trocarSenhaComSenhaAtual(UUID idCorretor, String senhaAtual, String novaSenha, String confirmacaoSenha){
-       // Todo: Adicionar autenticação com usuario logado
-
-        Corretor corretorEncontrado = corretorRepository.findById(idCorretor)
-                .orElseThrow(() -> new BusinessException("Corretor não encontrado"));
-        corretorValidator.validarSenha(corretorEncontrado, senhaAtual, novaSenha, confirmacaoSenha);
-        corretorEncontrado.setSenha(novaSenha);
-        criptografarSenhaSeNescessario(corretorEncontrado);
-        corretorRepository.save(corretorEncontrado);
-    }
-
-    public void esqueceuASenha(){
-        // TODO: Implementar futuramente
-    }
-
-    private void criptografarSenhaSeNescessario(Corretor corretor){
-        String senha = corretor.getSenha();
-        if (!senha.startsWith("{")){
-            corretor.setSenha(encoder.encode(senha));
-        }
-    }
-
 }

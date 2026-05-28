@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.br.CPF;
 public record CorretorUpdateRequestDTO(
 
         String nome,
+        String bio,
         @CPF
         String cpf,
         @Email
