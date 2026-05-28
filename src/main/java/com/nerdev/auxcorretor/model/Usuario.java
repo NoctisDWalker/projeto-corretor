@@ -36,6 +36,9 @@ public class Usuario {
     private Conta conta;
 
     @Column(nullable = false)
+    private String nomeExibicao;
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     PerfilUsuarioEnum perfilUsuario;
 
