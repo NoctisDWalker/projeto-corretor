@@ -14,5 +14,10 @@ public interface CredencialUsuarioRepository extends JpaRepository<CredencialUsu
             String providerUserId
     );
 
+    boolean existsByEmail(String email);
+    boolean existsByProviderUserIdAndProviderType(
+            String providerUserId,
+            ProviderTypeEnum providerType
+    );
 
 }

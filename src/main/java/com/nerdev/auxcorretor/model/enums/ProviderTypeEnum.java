@@ -2,7 +2,7 @@ package com.nerdev.auxcorretor.model.enums;
 
 public enum ProviderTypeEnum {
 
-    EMAIL_SENHA,
+    LOGIN_LOCAL,
     GOOGLE,
     FACEBOOK,
     MICROSOFT,
