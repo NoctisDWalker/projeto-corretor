@@ -39,7 +39,7 @@ public class RegistrarCorretorValidator {
         Conta conta = contaRepository.findById(uuid)
                 .orElseThrow(() -> new BusinessException("Conta inexistente"));
 
-        if (conta.getStatusConta().isFinalizado()) {
+        if (conta.getStatusConta().acessoBloqueado()) {
             throw new BusinessException("Conta cancelada.");
         }
     }

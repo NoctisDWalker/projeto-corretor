@@ -51,10 +51,7 @@ public class Conta {
     private StatusContaEnum statusConta;
 
     @Column(unique = true)
-    private String cpf;
-
-    @Column(unique = true)
-    private String cnpj;
+    private String documento;
 
     @Column(nullable = false, unique = true)
     private String emailResponsavel;
@@ -67,15 +64,15 @@ public class Conta {
     private PlanoEnum plano;
 
     @Column
-    private LocalDateTime dataExpiracaoTrial;
+    private LocalDateTime dataExpiracao;
 
     @Column(nullable = false, updatable = false)
     @CreatedDate
-    private LocalDateTime dataCriacao;
+    private LocalDateTime createdAt;
 
-    @Column(nullable = false)
+    @Column
     @LastModifiedDate
-    private LocalDateTime dataAtualizacao;
+    private LocalDateTime updatedAt;
 
     @Column
     private LocalDateTime dataCancelamento;
