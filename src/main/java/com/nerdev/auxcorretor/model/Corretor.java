@@ -44,7 +44,9 @@ public class Corretor {
     @Column
     private String bio;
 
-    @Column(unique = true, nullable = false)
+    // TODO: Remover campo na refatoração do cadastro de corretor.
+    // O e-mail passou a ser responsabilidade de CredencialUsuario.
+    @Column(unique = true)
     private String email;
 
     @Column
@@ -65,7 +67,7 @@ public class Corretor {
     private LocalDate dataCadastro;
 
     public boolean pertenceAConta(Conta conta) {
-       return corretorContas.stream()
+        return corretorContas.stream()
                 .anyMatch(c -> c.getDeletedAt() == null
                         && c.getConta().getId().equals(conta.getId()));
     }

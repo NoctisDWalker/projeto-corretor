@@ -37,7 +37,7 @@ public class AuthService {
 
     public AuthResponseDTO login(LoginRequestDTO loginRequestDTO) {
         CredencialUsuario credencial = credUserRepository.findByProviderTypeAndProviderUserId
-                (loginRequestDTO.providerType(), loginRequestDTO.login()).orElseThrow(
+                (ProviderTypeEnum.LOGIN_LOCAL, loginRequestDTO.login()).orElseThrow(
                 () -> new AuthBussinessExeption("Usuário ou senha inválidos"));
 
         boolean matchesPassword = encoder.matches(loginRequestDTO.senha(), credencial.getPasswordHash());

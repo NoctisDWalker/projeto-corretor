@@ -39,7 +39,7 @@ public class CorretorConta {
     @Column(nullable = false)
     private String emailProfissional;
 
-    @Column(nullable = false)
+    @Column
     private String telefoneProfissional;
 
     @CreatedDate

@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record LoginRequestDTO(
-        @NotNull ProviderTypeEnum providerType,
         @NotBlank String login,
         @NotBlank String senha
 ) {
