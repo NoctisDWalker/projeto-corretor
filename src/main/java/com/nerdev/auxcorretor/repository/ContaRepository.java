@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface ContaRepository extends JpaRepository<Conta, UUID> {
 
-    Optional<Conta> findByEmail(String email);
+    Optional<Conta> findByEmailResponsavel(String email);
 
     boolean existsByNomeIgnoreCase(String nome);
     boolean existsByDocumentoIgnoreCase(String documento);

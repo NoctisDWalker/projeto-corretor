@@ -1,6 +1,5 @@
 package com.nerdev.auxcorretor.model.enums;
 
-import java.util.List;
 import java.util.Set;
 
 public enum StatusContaEnum {
@@ -22,9 +21,9 @@ public enum StatusContaEnum {
 
     static {
         TRIAL.proximosStatus = Set.of(ATIVA, SUSPENSA);
-        ATIVA.proximosStatus = Set.of(SUSPENSA);
+        ATIVA.proximosStatus = Set.of(SUSPENSA, CANCELADA);
         SUSPENSA.proximosStatus = Set.of(ATIVA, CANCELADA);
-        CANCELADA.proximosStatus = Set.of();
+        CANCELADA.proximosStatus = Set.of(ATIVA);
     }
 
     public boolean podeTransicionarPara(StatusContaEnum destino) {

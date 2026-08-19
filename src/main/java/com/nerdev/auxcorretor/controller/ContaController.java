@@ -3,6 +3,7 @@ package com.nerdev.auxcorretor.controller;
 import com.nerdev.auxcorretor.dto.conta.ContaCreateRequestDTO;
 import com.nerdev.auxcorretor.dto.conta.ContaResponseDTO;
 import com.nerdev.auxcorretor.dto.conta.ContaUpdateRequestDTO;
+import com.nerdev.auxcorretor.model.enums.StatusContaEnum;
 import com.nerdev.auxcorretor.service.ContaService;
 import com.nerdev.auxcorretor.web.util.RestLocationBuilder;
 import jakarta.validation.Valid;
@@ -30,11 +31,23 @@ public class ContaController {
         return ResponseEntity.created(location).body(salva);
     }
 
-    @PatchMapping
-    public  ResponseEntity<ContaResponseDTO> atualizarConta(@PathVariable UUID id,
+    @PatchMapping("/{id}/atualizar")
+    public ResponseEntity<ContaResponseDTO> atualizarConta(@PathVariable UUID id,
                                                             @RequestBody @Valid ContaUpdateRequestDTO dto){
         ContaResponseDTO atualizado = contaService.atualizar(id, dto);
         return ResponseEntity.ok(atualizado);
+    }
+
+    @PatchMapping("/{id}/cancelar")
+    public ResponseEntity<Void> cancelarConta(@PathVariable UUID id){
+        contaService.inativar(id, StatusContaEnum.CANCELADA);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/suspender")
+    public ResponseEntity<Void> suspenderConta(@PathVariable UUID id){
+        contaService.inativar(id, StatusContaEnum.SUSPENSA);
+        return ResponseEntity.noContent().build();
     }
 
 }

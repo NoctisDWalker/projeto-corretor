@@ -23,10 +23,13 @@ public class ContaValidator {
 
     public void validarContaOperacional(Conta conta) {
         validaDataExpiracao(conta.getDataExpiracao());
-        validaStatus(conta.getStatusConta());
+        validaAcesso(conta.getStatusConta());
         validaUnicoEmail(conta);
     }
 
+    public void validaSuspenderOuInativar(Conta conta) {
+        validaStatusInativar(conta.getStatusConta());
+    }
 
     private void validaDataExpiracao(LocalDateTime dataExpiracao) {
         if (dataExpiracao.isBefore(LocalDateTime.now())) {
@@ -34,7 +37,7 @@ public class ContaValidator {
         }
     }
 
-    private void validaStatus(StatusContaEnum statusConta) {
+    private void validaAcesso(StatusContaEnum statusConta) {
         if (statusConta.acessoBloqueado()) {
             throw new BusinessException("Conta com acesso bloqueado");
         }
@@ -54,10 +57,17 @@ public class ContaValidator {
         validaUnicoEmail(conta);
     }
 
+    private void validaStatusInativar(StatusContaEnum statusConta) {
+        if (!statusConta.podeTransicionarPara(StatusContaEnum.SUSPENSA)
+        || !statusConta.podeTransicionarPara(StatusContaEnum.CANCELADA)) {
+            throw new BusinessException("Conta não pode ser suspensa ou cancelada.");
+        }
+    }
+
     private void validaUnicoEmail(Conta conta) {
 
         Optional<Conta> contaEncontrada =
-                contaRepository.findByEmail(conta.getEmailResponsavel());
+                contaRepository.findByEmailResponsavel(conta.getEmailResponsavel());
 
         if (contaEncontrada.isEmpty()) {
             return;
