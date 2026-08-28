@@ -1,6 +1,5 @@
 package com.nerdev.auxcorretor.model;
 
-import com.nerdev.auxcorretor.exception.BusinessException;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -43,11 +42,6 @@ public class Corretor {
 
     @Column
     private String bio;
-
-    // TODO: Remover campo na refatoração do cadastro de corretor.
-    // O e-mail passou a ser responsabilidade de CredencialUsuario.
-    @Column(unique = true)
-    private String email;
 
     @Column
     private String telefone;

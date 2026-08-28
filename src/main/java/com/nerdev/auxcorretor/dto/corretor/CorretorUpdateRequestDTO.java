@@ -9,10 +9,6 @@ public record CorretorUpdateRequestDTO(
 
         String nome,
         String bio,
-        @CPF
-        String cpf,
-        @Email
-        String email,
         String telefone,
         String creci
 

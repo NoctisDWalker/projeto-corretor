@@ -10,10 +10,8 @@ public record CorretorResponseDTO(
 
         UUID id,
         String nome,
-        String bio,
         String cpf,
-        String email,
-        String telefone,
+        String bio,
         String creci,
         Boolean ativo,
         LocalDate dataCadastro

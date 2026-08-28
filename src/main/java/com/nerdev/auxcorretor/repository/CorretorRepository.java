@@ -11,12 +11,7 @@ import java.util.UUID;
 @Repository
 public interface CorretorRepository extends JpaRepository<Corretor, UUID> {
 
-    Optional<Corretor> findByEmail(String email);
-    Optional<Corretor> findByCpf(String cpf);
     Optional<Corretor> findByCreci(String creci);
-    Optional<Corretor> findByEmailAndAtivoTrue(String email);
-
     boolean existsByCreci(String cresci);
     boolean existsByCpf(String cpf);
-    boolean existsByEmail(String email);
 }
