@@ -97,7 +97,7 @@ public class ImovelService {
     }
 
     private Corretor buscaCorretorLogado() {
-        String idCorretor = "e447e911-a647-4bbd-ac0e-eed4b4660cdf";
+        String idCorretor = "b1452570-2e78-4487-8c40-b90de9b79dac";
         Corretor corretorLogado = corretorRepository.findById(UUID.fromString(idCorretor))
                 .orElseThrow(() -> new BusinessException("Corretor não encontrado"));
         return corretorLogado;

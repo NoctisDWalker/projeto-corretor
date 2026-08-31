@@ -61,9 +61,7 @@ public class VisitaService {
         validaRelacionamentoVisitaAtendimento(atendimentoEncontrado, visitaPersistida);
 
         Visita visitaAtualizada = visitaMapper.cloneEntity(updateDto);
-        visitaAtualizada.setId(visitaPersistida.getId());
-        visitaAtualizada.setAtendimento(visitaPersistida.getAtendimento());
-        visitaAtualizada.setImovel(visitaPersistida.getImovel());
+        prepararVisitaAtualizada(visitaAtualizada, visitaPersistida);
 
         visitaValidator.validaAtualizar(visitaPersistida, visitaAtualizada, atendimentoEncontrado);
         visitaMapper.updateEntity(visitaPersistida, updateDto);
@@ -135,6 +133,12 @@ public class VisitaService {
         visitaCriada.setAtendimento(atendimentoEncontrado);
         visitaCriada.setImovel(imovelEncontrado);
         visitaCriada.setStatusVisita(StatusVisitaEnum.AGENDADA);
+    }
+
+    private static void prepararVisitaAtualizada(Visita visitaAtualizada, Visita visitaPersistida) {
+        visitaAtualizada.setId(visitaPersistida.getId());
+        visitaAtualizada.setAtendimento(visitaPersistida.getAtendimento());
+        visitaAtualizada.setImovel(visitaPersistida.getImovel());
     }
 
     private void validaRelacionamentoVisitaAtendimento(Atendimento atendimento, Visita visita) {
