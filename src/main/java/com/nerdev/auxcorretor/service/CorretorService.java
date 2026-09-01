@@ -8,8 +8,14 @@ import com.nerdev.auxcorretor.model.Corretor;
 import com.nerdev.auxcorretor.repository.CorretorRepository;
 import com.nerdev.auxcorretor.validation.CorretorValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import static com.nerdev.auxcorretor.repository.specs.CorretorSpecs.*;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -56,4 +62,51 @@ public class CorretorService {
         corretorEncontrado.setAtivo(true);
         corretorRepository.save(corretorEncontrado);
     }
+
+    public CorretorResponseDTO buscarCorretorPorId(UUID id){
+        Corretor corretorEncontrado = corretorRepository.findById(id)
+                .orElse(null);
+
+        return corretorMapper.toResponseDTO(corretorEncontrado);
+    }
+
+    public List<CorretorResponseDTO> listarCorretores(){
+        List<Corretor> corretores = corretorRepository.findAll();
+
+        return corretorMapper.toDtoList(corretores);
+    }
+
+    public Page<CorretorResponseDTO> pesquisaCorretores(
+            UUID id,
+            String nome,
+            String cpf,
+            String creci,
+            Integer pagina,
+            Integer tamanho
+    ){
+
+        Specification<Corretor> spec = ((root, query, criteriaBuilder) -> criteriaBuilder.conjunction());
+
+        if (id != null) {
+            spec = spec.and(idEqual(id));
+        }
+        if (isNotNullOrEmpty(nome)) {
+            spec = spec.and(nomeLike(nome));
+        }
+        if (isNotNullOrEmpty(cpf)) {
+            spec = spec.and(cpfLike(cpf));
+        }
+        if (isNotNullOrEmpty(creci)) {
+            spec = spec.and(creciLike(creci));
+        }
+
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+        Page<Corretor> page = corretorRepository.findAll(spec, pageable);
+        return page.map(corretorMapper::toResponseDTO);
+    }
+
+    private boolean isNotNullOrEmpty(String string){
+        return string != null || !string.isEmpty();
+    }
+
 }

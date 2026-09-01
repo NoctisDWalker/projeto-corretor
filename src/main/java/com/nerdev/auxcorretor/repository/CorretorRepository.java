@@ -2,6 +2,7 @@ package com.nerdev.auxcorretor.repository;
 
 import com.nerdev.auxcorretor.model.Corretor;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface CorretorRepository extends JpaRepository<Corretor, UUID> {
+public interface CorretorRepository extends JpaRepository<Corretor, UUID>, JpaSpecificationExecutor<Corretor> {
 
     Optional<Corretor> findByCreci(String creci);
     boolean existsByCreci(String cresci);
