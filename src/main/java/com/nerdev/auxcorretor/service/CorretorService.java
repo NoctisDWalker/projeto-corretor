@@ -106,7 +106,7 @@ public class CorretorService {
     }
 
     private boolean isNotNullOrEmpty(String string){
-        return string != null || !string.isEmpty();
+        return string != null && !string.isEmpty();
     }
 
 }

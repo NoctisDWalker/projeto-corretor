@@ -1,6 +1,7 @@
 package com.nerdev.auxcorretor.service;
 
 import com.nerdev.auxcorretor.dto.cliente.ClienteCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.cliente.ClienteFindResponseDto;
 import com.nerdev.auxcorretor.dto.cliente.ClienteResponseDTO;
 import com.nerdev.auxcorretor.dto.cliente.ClienteUpdateRequestDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
@@ -10,7 +11,12 @@ import com.nerdev.auxcorretor.model.enums.StatusClienteEnum;
 import com.nerdev.auxcorretor.repository.ClienteRepository;
 import com.nerdev.auxcorretor.validation.ClienteValidator;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import static com.nerdev.auxcorretor.repository.specs.ClienteSpecs.*;
 
 import java.util.UUID;
 
@@ -60,4 +66,43 @@ public class ClienteService {
         Cliente clienteSalvo = clienteRepository.save(clienteEncontrado);
         return clienteMapper.toDto(clienteSalvo);
     }
+
+    public Page<ClienteFindResponseDto> pesquisaCliente(
+            String nome,
+            String cpf,
+            String telefone,
+            String email,
+            StatusClienteEnum status,
+            Integer pagina,
+            Integer tamanho
+    ){
+
+        Specification<Cliente> spec = (root, query, cb) -> cb.conjunction();
+
+        if (isNotNullOrEmpty(nome)) {
+            spec = spec.and(nomeLike(nome));
+        }
+        if (isNotNullOrEmpty(cpf)) {
+            spec = spec.and(cpfLike(cpf));
+        }
+        if (isNotNullOrEmpty(telefone)) {
+            spec = spec.and(telefoneLike(telefone));
+        }
+        if (isNotNullOrEmpty(email)) {
+            spec = spec.and(emailLike(email));
+        }
+        if (status != null) {
+            spec = spec.and(statusEquals(status));
+        }
+
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+        Page<Cliente> page = clienteRepository.findAll(spec, pageable);
+
+        return page.map(clienteMapper::toFindDto);
+    }
+
+    private boolean isNotNullOrEmpty(String string){
+        return string != null && !string.isEmpty();
+    }
+
 }
