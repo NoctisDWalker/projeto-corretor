@@ -1,6 +1,7 @@
 package com.nerdev.auxcorretor.mapper;
 
 import com.nerdev.auxcorretor.dto.visita.VisitaCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.visita.VisitaFindResponseDTO;
 import com.nerdev.auxcorretor.dto.visita.VisitaResponseDTO;
 import com.nerdev.auxcorretor.dto.visita.VisitaUpdateRequestDTO;
 import com.nerdev.auxcorretor.model.Visita;
@@ -32,4 +33,8 @@ public interface VisitaMapper {
     @Mapping(source = "atendimento.id", target = "idAtendimento")
     @Mapping(source = "imovel.id", target = "idImovel")
     VisitaResponseDTO toDTO(Visita entity);
+
+    @Mapping(source = "atendimento.id", target = "idAtendimento")
+    @Mapping(source = "imovel.id", target = "idImovel")
+    VisitaFindResponseDTO toFindDTO(Visita entity);
 }

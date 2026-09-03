@@ -1,24 +1,30 @@
 package com.nerdev.auxcorretor.service;
 
-import com.nerdev.auxcorretor.dto.visita.HistoricoVisitaResponseDTO;
-import com.nerdev.auxcorretor.dto.visita.VisitaCreateRequestDTO;
-import com.nerdev.auxcorretor.dto.visita.VisitaResponseDTO;
-import com.nerdev.auxcorretor.dto.visita.VisitaUpdateRequestDTO;
+import com.nerdev.auxcorretor.dto.visita.*;
 import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.mapper.HistoricoVisitaMapper;
 import com.nerdev.auxcorretor.mapper.VisitaMapper;
 import com.nerdev.auxcorretor.model.Atendimento;
 import com.nerdev.auxcorretor.model.Imovel;
 import com.nerdev.auxcorretor.model.Visita;
+import com.nerdev.auxcorretor.model.enums.InteresseClienteEnum;
 import com.nerdev.auxcorretor.model.enums.StatusVisitaEnum;
 import com.nerdev.auxcorretor.model.historicos.HistoricoVisita;
 import com.nerdev.auxcorretor.repository.AtendimentoRepository;
 import com.nerdev.auxcorretor.repository.ImovelRepository;
 import com.nerdev.auxcorretor.repository.VisitaRepository;
+import com.nerdev.auxcorretor.repository.specs.SpecificationBuilder;
+import com.nerdev.auxcorretor.repository.specs.VisitaSpecs;
 import com.nerdev.auxcorretor.validation.VisitaValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -130,6 +136,42 @@ public class VisitaService {
         List<HistoricoVisita> historicos = visitaEncontrada.getHistoricos();
 
         return historicoVisitaMapper.toDtoList(historicos);
+    }
+
+    public Page<VisitaFindResponseDTO> pesquisaVisita(
+            UUID idAtendimento,
+            UUID idImovel,
+            LocalDate menorDataAgendada,
+            LocalDate maiorDataAgendada,
+            LocalDate menorDataRealizada,
+            LocalDate maiorDataRealizada,
+            StatusVisitaEnum statusVisita,
+            InteresseClienteEnum interesseCliente,
+            LocalDate menorDataCadastro,
+            LocalDate maiorDataCadastro,
+            Integer pagina,
+            Integer tamanho
+    ){
+        Specification<Visita> spec = new SpecificationBuilder<Visita>()
+                .and(idAtendimento, VisitaSpecs::idAtendimentoEquals)
+                .and(idImovel, VisitaSpecs::idImovelEquals)
+                .and(menorDataAgendada, VisitaSpecs::menorDataAgendada)
+                .and(maiorDataAgendada, VisitaSpecs::maiorDataAgendada)
+                .and(menorDataRealizada, VisitaSpecs::menorDataRealizada)
+                .and(maiorDataRealizada, VisitaSpecs::maiorDataRealizada)
+                .and(statusVisita, VisitaSpecs::statusVisitaEqual)
+                .and(interesseCliente, VisitaSpecs::interesseClienteEqual)
+                .and(menorDataCadastro, VisitaSpecs::menorDataCadastro)
+                .and(maiorDataCadastro, VisitaSpecs::maiorDataCadastro)
+                .build();
+
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("dataHoraAgendada").descending());
+        Page<Visita> page = visitaRepository.findAll(spec, pageable);
+        return  page.map(visitaMapper::toFindDTO);
+    }
+
+    private boolean isNotNullOrEmpty(String valor){
+        return valor != null && !valor.isEmpty();
     }
 
     private void prepararNovaVisita(Visita visitaCriada, Atendimento atendimentoEncontrado, Imovel imovelEncontrado) {
