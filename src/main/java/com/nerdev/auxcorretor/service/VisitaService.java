@@ -45,6 +45,7 @@ public class VisitaService {
 
         visitaValidator.validaCadastro(visitaCriada, atendimentoEncontrado);
         Visita visitaSalva = visitaRepository.save(visitaCriada);
+        imovelRepository.imcrementarVisitas(atendimentoEncontrado.getId());
         historicoVisitaService.criarHistoricoAutomatico(visitaSalva, "Visita criada.");
 
         return visitaMapper.toDTO(visitaSalva);
@@ -88,9 +89,11 @@ public class VisitaService {
         visitaEncontrada.setStatusVisita(StatusVisitaEnum.CANCELADA);
 
         Visita visitaCancelada = visitaRepository.save(visitaEncontrada);
+        imovelRepository.decrementarVisitas(atendimentoEncontrado.getId());
         historicoVisitaService.criarHistoricoAutomatico(visitaCancelada, mensagemHistorico(visitaCancelada.getStatusVisita()));
     }
 
+    // Todo: possivelmente excluir este metodo
     public void reativarVisita(UUID id, UUID idAtendimento) {
         Visita visitaEncontrada = visitaRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Visita não encontrada"));

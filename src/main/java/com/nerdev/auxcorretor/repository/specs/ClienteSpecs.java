@@ -23,7 +23,7 @@ public class ClienteSpecs {
     }
 
     public static Specification<Cliente> statusEquals(StatusClienteEnum status) {
-        return (root, query, cb) -> cb.equal(root.get("status"), status);
+        return (root, query, cb) -> cb.equal(root.get("statusCliente"), status);
     }
 
 }

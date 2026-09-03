@@ -1,19 +1,31 @@
 package com.nerdev.auxcorretor.service;
 
 import com.nerdev.auxcorretor.dto.imovel.ImovelCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.imovel.ImovelFindResponseDTO;
 import com.nerdev.auxcorretor.dto.imovel.ImovelResponseDTO;
 import com.nerdev.auxcorretor.dto.imovel.ImovelUpdateRequestDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.mapper.ImovelMapper;
 import com.nerdev.auxcorretor.model.Corretor;
 import com.nerdev.auxcorretor.model.Imovel;
+import com.nerdev.auxcorretor.model.enums.FinalidadeImovelEnum;
 import com.nerdev.auxcorretor.model.enums.StatusImovelEnum;
+import com.nerdev.auxcorretor.model.enums.TipoImovelEnum;
 import com.nerdev.auxcorretor.repository.CorretorRepository;
 import com.nerdev.auxcorretor.repository.ImovelRepository;
+import com.nerdev.auxcorretor.repository.specs.ImovelSpecs;
 import com.nerdev.auxcorretor.validation.ImovelValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import static com.nerdev.auxcorretor.repository.specs.ImovelSpecs.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -103,5 +115,61 @@ public class ImovelService {
         return corretorLogado;
     }
 
+    public Page<ImovelFindResponseDTO> pesquisaImovel(
+            String titulo,
+            BigDecimal valorMinimo,
+            BigDecimal valorMaximo,
+            FinalidadeImovelEnum finalidadeImovel,
+            TipoImovelEnum tipoImovel,
+            String cidade,
+            String bairro,
+            StatusImovelEnum statusImovel,
+            UUID corretorResponsavelId,
+            LocalDate dataCadastro,
+            Integer pagina,
+            Integer tamanho
+    ){
+        Specification<Imovel> spec = (root, query, cb) -> cb.conjunction();
+
+        if (isNotNullOrEmpty(titulo)) {
+            spec = spec.and(tituloLike(titulo));
+        }
+        if (valorMinimo != null) {
+            spec = spec.and(valorMinimo(valorMinimo));
+        }
+        if (valorMaximo != null) {
+            spec = spec.and(valorMaximo(valorMaximo));
+        }
+        if (finalidadeImovel != null) {
+            spec = spec.and(finalidadeEquals(finalidadeImovel));
+        }
+        if (tipoImovel != null) {
+            spec = spec.and(tipoEquals(tipoImovel));
+        }
+        if (isNotNullOrEmpty(cidade)) {
+            spec = spec.and(cidadeLike(cidade));
+        }
+        if (isNotNullOrEmpty(bairro)) {
+            spec = spec.and(bairroLike(bairro));
+        }
+        if (statusImovel != null) {
+            spec = spec.and(statusEquals(statusImovel));
+        }
+        if (corretorResponsavelId != null) {
+            spec = spec.and(corretorResponsavelEquals(corretorResponsavelId));
+        }
+        if (dataCadastro != null) {
+            spec = spec.and(dataCadastroAte(dataCadastro));
+        }
+
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("dataCadastro").descending());
+        Page<Imovel> page = imovelRepository.findAll(spec, pageable);
+
+        return page.map(imovelMapper::toFindDTO);
+    }
+
+    private boolean isNotNullOrEmpty(String string) {
+        return  string != null && !string.isEmpty();
+    }
 
 }
