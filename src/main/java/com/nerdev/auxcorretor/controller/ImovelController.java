@@ -80,13 +80,14 @@ public class ImovelController {
             @RequestParam(value = "bairro", required = false) String bairro,
             @RequestParam(value = "status-imovel", required = false) StatusImovelEnum statusImovel,
             @RequestParam(value = "corretor-responsavel-id", required = false) UUID corretorResponsavelId,
-            @RequestParam(value = "data-cadastro", required = false) LocalDate dataCadastro,
+            @RequestParam(value = "data-cadastro-inicial", required = false) LocalDate dataCadastroInicial,
+            @RequestParam(value = "data-cadastro-final", required = false) LocalDate dataCadastroFinal,
             @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
             @RequestParam(value = "tamanho", defaultValue = "10") Integer tamanho
     ) {
         Page<ImovelFindResponseDTO> resultado = imovelService.pesquisaImovel(
                 titulo, valorMinimo, valorMaximo, finalidadeImovel, tipoImovel, cidade, bairro,
-                statusImovel, corretorResponsavelId, dataCadastro, pagina, tamanho
+                statusImovel, corretorResponsavelId, dataCadastroInicial, dataCadastroFinal, pagina, tamanho
         );
         return ResponseEntity.ok(resultado);
     }

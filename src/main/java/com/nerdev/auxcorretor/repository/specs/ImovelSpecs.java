@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 public class ImovelSpecs {
@@ -48,7 +49,11 @@ public class ImovelSpecs {
         return (root, query, cb) -> cb.equal(root.get("corretorResponsavel").get("id"), corretorResponsavelId);
     }
 
-    public static Specification<Imovel> dataCadastroAte(LocalDate dataCadastro) {
-        return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("dataCadastro"), dataCadastro);
+    public static Specification<Imovel> dataCadastroInicial(LocalDate dataCadastroInicial) {
+        return (root, query, cb) -> cb.lessThanOrEqualTo(root.get("dataCadastro"), dataCadastroInicial.atStartOfDay());
+    }
+
+    public static Specification<Imovel> dataCadastroFinal(LocalDate dataCadastroFinal) {
+        return (root, query, cb) -> cb.equal(root.get("dataCadastro"), dataCadastroFinal.atTime(LocalTime.MAX));
     }
 }

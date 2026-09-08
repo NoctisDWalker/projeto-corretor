@@ -14,6 +14,7 @@ import com.nerdev.auxcorretor.model.enums.TipoImovelEnum;
 import com.nerdev.auxcorretor.repository.CorretorRepository;
 import com.nerdev.auxcorretor.repository.ImovelRepository;
 import com.nerdev.auxcorretor.repository.specs.ImovelSpecs;
+import com.nerdev.auxcorretor.repository.specs.SpecificationBuilder;
 import com.nerdev.auxcorretor.validation.ImovelValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -125,51 +126,28 @@ public class ImovelService {
             String bairro,
             StatusImovelEnum statusImovel,
             UUID corretorResponsavelId,
-            LocalDate dataCadastro,
+            LocalDate dataCadastroInicial,
+            LocalDate dataCadastroFinal,
             Integer pagina,
             Integer tamanho
     ){
-        Specification<Imovel> spec = (root, query, cb) -> cb.conjunction();
-
-        if (isNotNullOrEmpty(titulo)) {
-            spec = spec.and(tituloLike(titulo));
-        }
-        if (valorMinimo != null) {
-            spec = spec.and(valorMinimo(valorMinimo));
-        }
-        if (valorMaximo != null) {
-            spec = spec.and(valorMaximo(valorMaximo));
-        }
-        if (finalidadeImovel != null) {
-            spec = spec.and(finalidadeEquals(finalidadeImovel));
-        }
-        if (tipoImovel != null) {
-            spec = spec.and(tipoEquals(tipoImovel));
-        }
-        if (isNotNullOrEmpty(cidade)) {
-            spec = spec.and(cidadeLike(cidade));
-        }
-        if (isNotNullOrEmpty(bairro)) {
-            spec = spec.and(bairroLike(bairro));
-        }
-        if (statusImovel != null) {
-            spec = spec.and(statusEquals(statusImovel));
-        }
-        if (corretorResponsavelId != null) {
-            spec = spec.and(corretorResponsavelEquals(corretorResponsavelId));
-        }
-        if (dataCadastro != null) {
-            spec = spec.and(dataCadastroAte(dataCadastro));
-        }
+        Specification<Imovel> spec = new SpecificationBuilder<Imovel>()
+                .andIfNotBlank(titulo, ImovelSpecs::tituloLike)
+                .and(valorMinimo, ImovelSpecs::valorMinimo)
+                .and(valorMaximo, ImovelSpecs::valorMaximo)
+                .and(finalidadeImovel, ImovelSpecs::finalidadeEquals)
+                .and(tipoImovel, ImovelSpecs::tipoEquals)
+                .andIfNotBlank(cidade, ImovelSpecs::cidadeLike)
+                .andIfNotBlank(bairro, ImovelSpecs::bairroLike)
+                .and(statusImovel, ImovelSpecs::statusEquals)
+                .and(corretorResponsavelId, ImovelSpecs::corretorResponsavelEquals)
+                .and(dataCadastroInicial, ImovelSpecs::dataCadastroInicial)
+                .and(dataCadastroFinal, ImovelSpecs::dataCadastroFinal)
+                .build();
 
         Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("dataCadastro").descending());
         Page<Imovel> page = imovelRepository.findAll(spec, pageable);
 
         return page.map(imovelMapper::toFindDTO);
     }
-
-    private boolean isNotNullOrEmpty(String string) {
-        return  string != null && !string.isEmpty();
-    }
-
 }

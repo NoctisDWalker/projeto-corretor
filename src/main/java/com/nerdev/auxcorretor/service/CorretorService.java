@@ -6,6 +6,8 @@ import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.mapper.CorretorMapper;
 import com.nerdev.auxcorretor.model.Corretor;
 import com.nerdev.auxcorretor.repository.CorretorRepository;
+import com.nerdev.auxcorretor.repository.specs.CorretorSpecs;
+import com.nerdev.auxcorretor.repository.specs.SpecificationBuilder;
 import com.nerdev.auxcorretor.validation.CorretorValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -85,28 +87,15 @@ public class CorretorService {
             Integer tamanho
     ){
 
-        Specification<Corretor> spec = ((root, query, criteriaBuilder) -> criteriaBuilder.conjunction());
-
-        if (id != null) {
-            spec = spec.and(idEqual(id));
-        }
-        if (isNotNullOrEmpty(nome)) {
-            spec = spec.and(nomeLike(nome));
-        }
-        if (isNotNullOrEmpty(cpf)) {
-            spec = spec.and(cpfLike(cpf));
-        }
-        if (isNotNullOrEmpty(creci)) {
-            spec = spec.and(creciLike(creci));
-        }
+        Specification<Corretor> spec = new SpecificationBuilder<Corretor>()
+                .and(id, CorretorSpecs::idEqual)
+                .andIfNotBlank(nome, CorretorSpecs::nomeLike)
+                .andIfNotBlank(cpf, CorretorSpecs::cpfLike)
+                .andIfNotBlank(creci, CorretorSpecs::creciLike)
+                .build();
 
         Pageable pageable = PageRequest.of(pagina, tamanho);
         Page<Corretor> page = corretorRepository.findAll(spec, pageable);
         return page.map(corretorMapper::toResponseDTO);
     }
-
-    private boolean isNotNullOrEmpty(String string){
-        return string != null && !string.isEmpty();
-    }
-
 }

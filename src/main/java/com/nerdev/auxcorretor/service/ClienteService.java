@@ -9,6 +9,8 @@ import com.nerdev.auxcorretor.mapper.ClienteMapper;
 import com.nerdev.auxcorretor.model.Cliente;
 import com.nerdev.auxcorretor.model.enums.StatusClienteEnum;
 import com.nerdev.auxcorretor.repository.ClienteRepository;
+import com.nerdev.auxcorretor.repository.specs.ClienteSpecs;
+import com.nerdev.auxcorretor.repository.specs.SpecificationBuilder;
 import com.nerdev.auxcorretor.validation.ClienteValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -77,32 +79,18 @@ public class ClienteService {
             Integer tamanho
     ){
 
-        Specification<Cliente> spec = (root, query, cb) -> cb.conjunction();
+        Specification<Cliente> spec = new SpecificationBuilder<Cliente>()
+                .andIfNotBlank(nome, ClienteSpecs::nomeLike)
+                .andIfNotBlank(cpf, ClienteSpecs::cpfLike)
+                .andIfNotBlank(telefone, ClienteSpecs::telefoneLike)
+                .andIfNotBlank(email, ClienteSpecs::emailLike)
+                .and(status, ClienteSpecs::statusEquals)
+                .build();
 
-        if (isNotNullOrEmpty(nome)) {
-            spec = spec.and(nomeLike(nome));
-        }
-        if (isNotNullOrEmpty(cpf)) {
-            spec = spec.and(cpfLike(cpf));
-        }
-        if (isNotNullOrEmpty(telefone)) {
-            spec = spec.and(telefoneLike(telefone));
-        }
-        if (isNotNullOrEmpty(email)) {
-            spec = spec.and(emailLike(email));
-        }
-        if (status != null) {
-            spec = spec.and(statusEquals(status));
-        }
 
         Pageable pageable = PageRequest.of(pagina, tamanho);
         Page<Cliente> page = clienteRepository.findAll(spec, pageable);
 
         return page.map(clienteMapper::toFindDto);
     }
-
-    private boolean isNotNullOrEmpty(String string){
-        return string != null && !string.isEmpty();
-    }
-
 }
