@@ -1,6 +1,7 @@
 package com.nerdev.auxcorretor.service;
 
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.atendimento.AtendimentoFindResponseDTO;
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoResponseDTO;
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoUpdateRequestDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
@@ -12,10 +13,18 @@ import com.nerdev.auxcorretor.model.enums.StatusAtendimentoEnum;
 import com.nerdev.auxcorretor.repository.AtendimentoRepository;
 import com.nerdev.auxcorretor.repository.ClienteRepository;
 import com.nerdev.auxcorretor.repository.CorretorRepository;
+import com.nerdev.auxcorretor.repository.specs.AtendimentoSpecs;
+import com.nerdev.auxcorretor.repository.specs.SpecificationBuilder;
 import com.nerdev.auxcorretor.validation.AtendimentoValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -75,6 +84,34 @@ public class AtendimentoService {
                 .orElseThrow(() -> new BusinessException("Atendimento não encontrado"));
 
         return atendimentoMapper.toDTO(atendimento);
+    }
+
+    public Page<AtendimentoFindResponseDTO> pesquisaAtendimento(
+            UUID idCliente,
+            UUID idCorretor,
+            StatusAtendimentoEnum statusAtendimento,
+            LocalDate menorDataCadastro,
+            LocalDate maiorDataCadastro,
+            LocalDate menorDataFim,
+            LocalDate maiorDataFim,
+            Integer pagina,
+            Integer tamanho
+    ){
+
+        Specification<Atendimento> spec = new SpecificationBuilder<Atendimento>()
+                .and(idCliente, AtendimentoSpecs::idClienteEquals)
+                .and(idCorretor, AtendimentoSpecs::idCorretorEquals)
+                .and(statusAtendimento, AtendimentoSpecs::statusAtendimentoEquals)
+                .and(menorDataCadastro, AtendimentoSpecs::menorDataCadastro)
+                .and(maiorDataCadastro, AtendimentoSpecs::maiorDataCadastro)
+                .and(menorDataFim, AtendimentoSpecs::menorDataFim)
+                .and(maiorDataFim, AtendimentoSpecs::maiorDataFim)
+                .build();
+
+        Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("dataCadastro").descending());
+        Page<Atendimento> page = atendimentoRepository.findAll(spec, pageable);
+
+        return page.map(atendimentoMapper::toFindDTO);
     }
 
     private void regraDataFim(Atendimento atendimento, StatusAtendimentoEnum statusAnterior){

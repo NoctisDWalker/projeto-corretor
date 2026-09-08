@@ -170,10 +170,6 @@ public class VisitaService {
         return  page.map(visitaMapper::toFindDTO);
     }
 
-    private boolean isNotNullOrEmpty(String valor){
-        return valor != null && !valor.isEmpty();
-    }
-
     private void prepararNovaVisita(Visita visitaCriada, Atendimento atendimentoEncontrado, Imovel imovelEncontrado) {
         visitaCriada.setAtendimento(atendimentoEncontrado);
         visitaCriada.setImovel(imovelEncontrado);

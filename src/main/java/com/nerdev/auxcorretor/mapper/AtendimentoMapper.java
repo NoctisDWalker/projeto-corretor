@@ -1,6 +1,7 @@
 package com.nerdev.auxcorretor.mapper;
 
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.atendimento.AtendimentoFindResponseDTO;
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoResponseDTO;
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoUpdateRequestDTO;
 import com.nerdev.auxcorretor.model.Atendimento;
@@ -26,5 +27,9 @@ public interface AtendimentoMapper {
     @Mapping(source = "corretor.id", target = "idCorretor")
     @Mapping(source = "statusAtendimento",target = "status")
     AtendimentoResponseDTO toDTO(Atendimento atendimento);
+
+    @Mapping(source = "cliente.id", target = "idCliente")
+    @Mapping(source = "corretor.id", target = "idCorretor")
+    AtendimentoFindResponseDTO toFindDTO(Atendimento atendimento);
 
 }
