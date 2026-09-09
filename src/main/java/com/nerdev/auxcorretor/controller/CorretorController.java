@@ -1,5 +1,6 @@
 package com.nerdev.auxcorretor.controller;
 
+import com.nerdev.auxcorretor.dto.corretor.CorretorFindResponseDTO;
 import com.nerdev.auxcorretor.dto.corretor.CorretorResponseDTO;
 import com.nerdev.auxcorretor.dto.corretor.CorretorUpdateRequestDTO;
 import com.nerdev.auxcorretor.service.CorretorService;
@@ -54,7 +55,7 @@ public class CorretorController {
     }
 
     @GetMapping("/pesquisa")
-    ResponseEntity<Page<CorretorResponseDTO>> pesquisaCorretores(
+    ResponseEntity<Page<CorretorFindResponseDTO>> pesquisaCorretores(
             @RequestParam(value = "id", required = false) UUID id,
             @RequestParam(value = "nome", required = false) String nome,
             @RequestParam(value = "cpf", required = false) String cpf,
@@ -63,7 +64,7 @@ public class CorretorController {
             @RequestParam(value = "tamanho", defaultValue = "10") Integer tamanho
 
     ) {
-        Page<CorretorResponseDTO> resultado = corretorService.pesquisaCorretores(id, nome, cpf, creci, pagina, tamanho);
+        Page<CorretorFindResponseDTO> resultado = corretorService.pesquisaCorretores(id, nome, cpf, creci, pagina, tamanho);
         return ResponseEntity.ok(resultado);
     }
 

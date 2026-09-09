@@ -1,13 +1,10 @@
 package com.nerdev.auxcorretor.mapper;
 
-import com.nerdev.auxcorretor.dto.imovel.ImovelCreateRequestDTO;
-import com.nerdev.auxcorretor.dto.imovel.ImovelFindResponseDTO;
-import com.nerdev.auxcorretor.dto.imovel.ImovelResponseDTO;
-import com.nerdev.auxcorretor.dto.imovel.ImovelUpdateRequestDTO;
+import com.nerdev.auxcorretor.dto.imovel.*;
 import com.nerdev.auxcorretor.model.Imovel;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "Spring")
+@Mapper(componentModel = "spring", uses = {CorretorMapper.class})
 public interface ImovelMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -32,6 +29,8 @@ public interface ImovelMapper {
     @Mapping(source = "corretorResponsavel.id", target = "idCorretorResponsavel")
     ImovelResponseDTO toDTO(Imovel entity);
 
+    @Mapping(source = "corretorResponsavel", target = "corretor")
     ImovelFindResponseDTO toFindDTO(Imovel entity);
 
+    ImovelResumoDTO toResumoDTO(Imovel entity);
 }

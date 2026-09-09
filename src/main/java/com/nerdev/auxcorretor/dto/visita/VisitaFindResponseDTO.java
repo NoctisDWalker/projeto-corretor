@@ -1,5 +1,7 @@
 package com.nerdev.auxcorretor.dto.visita;
 
+import com.nerdev.auxcorretor.dto.atendimento.AtendimentoResumoDTO;
+import com.nerdev.auxcorretor.dto.imovel.ImovelResumoDTO;
 import com.nerdev.auxcorretor.model.enums.InteresseClienteEnum;
 import com.nerdev.auxcorretor.model.enums.StatusVisitaEnum;
 
@@ -9,8 +11,8 @@ import java.util.UUID;
 
 public record VisitaFindResponseDTO(
         UUID id,
-        UUID idAtendimento,
-        UUID idImovel,
+        AtendimentoResumoDTO atendimento,
+        ImovelResumoDTO imovel,
         LocalDateTime dataHoraAgendada,
         LocalDateTime dataHoraRealizada,
         StatusVisitaEnum statusVisita,

@@ -1,5 +1,6 @@
 package com.nerdev.auxcorretor.service;
 
+import com.nerdev.auxcorretor.dto.corretor.CorretorFindResponseDTO;
 import com.nerdev.auxcorretor.dto.corretor.CorretorResponseDTO;
 import com.nerdev.auxcorretor.dto.corretor.CorretorUpdateRequestDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
@@ -78,7 +79,7 @@ public class CorretorService {
         return corretorMapper.toDtoList(corretores);
     }
 
-    public Page<CorretorResponseDTO> pesquisaCorretores(
+    public Page<CorretorFindResponseDTO> pesquisaCorretores(
             UUID id,
             String nome,
             String cpf,
@@ -96,6 +97,6 @@ public class CorretorService {
 
         Pageable pageable = PageRequest.of(pagina, tamanho);
         Page<Corretor> page = corretorRepository.findAll(spec, pageable);
-        return page.map(corretorMapper::toResponseDTO);
+        return page.map(corretorMapper::toFindDto);
     }
 }

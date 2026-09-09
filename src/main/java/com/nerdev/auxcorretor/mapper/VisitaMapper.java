@@ -7,7 +7,7 @@ import com.nerdev.auxcorretor.dto.visita.VisitaUpdateRequestDTO;
 import com.nerdev.auxcorretor.model.Visita;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "Spring")
+@Mapper(componentModel = "spring", uses = {ImovelMapper.class, AtendimentoMapper.class})
 public interface VisitaMapper {
 
     @Mapping(target = "atendimento", ignore = true)
@@ -34,7 +34,5 @@ public interface VisitaMapper {
     @Mapping(source = "imovel.id", target = "idImovel")
     VisitaResponseDTO toDTO(Visita entity);
 
-    @Mapping(source = "atendimento.id", target = "idAtendimento")
-    @Mapping(source = "imovel.id", target = "idImovel")
     VisitaFindResponseDTO toFindDTO(Visita entity);
 }

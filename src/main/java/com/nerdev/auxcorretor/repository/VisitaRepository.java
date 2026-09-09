@@ -2,6 +2,10 @@ package com.nerdev.auxcorretor.repository;
 
 import com.nerdev.auxcorretor.model.Atendimento;
 import com.nerdev.auxcorretor.model.Visita;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -12,7 +16,13 @@ import java.util.UUID;
 @Repository
 public interface VisitaRepository extends JpaRepository<Visita, UUID>, JpaSpecificationExecutor<Visita> {
 
-    boolean existsByAtendimentoAndDataHoraAgendada(Atendimento atendimento, LocalDateTime dataHoraAgendada);
+    boolean existsByAtendimentoAndDataHoraAgendada(
+            Atendimento atendimento, LocalDateTime dataHoraAgendada);
 
-    boolean existsByAtendimentoAndDataHoraAgendadaAndIdNot(Atendimento atendimento, LocalDateTime dataHoraAgendada, UUID id);
+    boolean existsByAtendimentoAndDataHoraAgendadaAndIdNot(
+            Atendimento atendimento, LocalDateTime dataHoraAgendada, UUID id);
+
+    @Override
+    @EntityGraph(attributePaths = {"atendimento","imovel"})
+    Page<Visita> findAll(Specification<Visita> spec, Pageable pageable);
 }

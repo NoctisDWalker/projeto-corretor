@@ -9,14 +9,10 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Schema
-public record AtendimentoFindResponseDTO(
+public record AtendimentoResumoDTO(
         UUID id,
-        ClienteResumoDTO cliente,
         CorretorResumoDTO corretor,
-        StatusAtendimentoEnum statusAtendimento,
-        String observacoes,
-        LocalDateTime dataCadastro,
-        LocalDateTime dataFim,
-        LocalDateTime dataAtualizacao
+        ClienteResumoDTO cliente,
+        StatusAtendimentoEnum status
 ) {
 }
