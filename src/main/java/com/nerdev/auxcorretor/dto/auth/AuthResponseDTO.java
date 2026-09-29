@@ -11,7 +11,6 @@ public record AuthResponseDTO(
         PerfilUsuarioEnum perfil,
         ProviderTypeEnum providerType,
         String nomeExibicao
-
 ) {
 
 }

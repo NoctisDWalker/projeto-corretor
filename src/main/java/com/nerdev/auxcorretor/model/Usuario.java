@@ -38,9 +38,10 @@ public class Usuario {
     @Column(nullable = false)
     private String nomeExibicao;
 
-    @Column(nullable = false)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "perfis_usuario", joinColumns = @JoinColumn(name = "usuario_id"))
     @Enumerated(EnumType.STRING)
-    PerfilUsuarioEnum perfilUsuario;
+    Set <PerfilUsuarioEnum> perfilUsuario;
 
     @Column(nullable = false, updatable = false)
     @CreatedDate

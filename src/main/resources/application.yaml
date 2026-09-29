@@ -13,3 +13,8 @@ spring:
     properties:
       hibernate.format_sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+app:
+  security:
+    rsa-keys-private: ${PRIVATE_KEY_PATH:/home/prometeu/Projetos/Pessoais/projeto-corretor/keys/private.pem}
+    rsa-keys-public: ${PUBLIC_KEY_PATH:/home/prometeu/Projetos/Pessoais/projeto-corretor/keys/public.pem}
+    rsa-keys-id: ${KEY_ID_PATH:/home/prometeu/Projetos/Pessoais/projeto-corretor/keys/key-id.txt}
