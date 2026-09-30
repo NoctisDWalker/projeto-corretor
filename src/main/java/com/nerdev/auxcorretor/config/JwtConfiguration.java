@@ -1,5 +1,6 @@
 package com.nerdev.auxcorretor.config;
 
+import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -41,7 +42,7 @@ public class JwtConfiguration {
 
     @Bean
     public RSAKey rsaKey() throws Exception {
-        if (!verificarChaves()){
+        if (!verificarChaves()) {
             RSAKey rsaKey = gerarRSAKey();
             salvarRSAKey(rsaKey);
             return rsaKey;
@@ -55,8 +56,8 @@ public class JwtConfiguration {
     }
 
     @Bean
-    public JWKSource<SecurityContext> jwkSource (RSAKey rsaKey){
-        JWKSet  jwkSet = new JWKSet(rsaKey);
+    public JWKSource<SecurityContext> jwkSource(RSAKey rsaKey) {
+        JWKSet jwkSet = new JWKSet(rsaKey);
         return new ImmutableJWKSet<>(jwkSet);
     }
 
@@ -69,7 +70,7 @@ public class JwtConfiguration {
     }
 
     @Bean
-    public TokenSettings  tokenSettings() {
+    public TokenSettings tokenSettings() {
         return TokenSettings.builder()
                 .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
                 .accessTokenTimeToLive(Duration.ofHours(4))
@@ -106,33 +107,15 @@ public class JwtConfiguration {
     }
 
     private RSAPublicKey carregaChavePublica() throws Exception {
-        Path path = Paths.get(pathPublicKeyRSA);
-        String conteudo = Files.readString(path);
-        String chaveLimpa = conteudo
-                .replace("-----BEGIN PUBLIC KEY-----", "")
-                .replace("-----END PUBLIC KEY-----", "")
-                .replaceAll("\\s+", "");
-
-        byte[] chaveBase64 = Base64.getDecoder().decode(chaveLimpa);
-        X509EncodedKeySpec spec = new X509EncodedKeySpec(chaveBase64);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-        return (RSAPublicKey) keyFactory.generatePublic(spec);
+        String conteudo = Files.readString(Path.of(pathPublicKeyRSA));
+        JWK jwk = JWK.parseFromPEMEncodedObjects(conteudo);
+        return jwk.toRSAKey().toRSAPublicKey();
     }
 
     private RSAPrivateKey carregaChavePrivada() throws Exception {
-        Path path = Paths.get(pathPrivateKeyRSA);
-        String conteudo = Files.readString(path);
-        String chaveLimpa = conteudo
-                .replace("-----BEGIN PRIVATE KEY-----", "")
-                .replace("-----END PRIVATE KEY-----", "")
-                .replaceAll("\\s+", "");
-
-        byte[] chaveBase64 = Base64.getDecoder().decode(chaveLimpa);
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(chaveBase64);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-        return (RSAPrivateKey) keyFactory.generatePrivate(spec);
+        String conteudo = Files.readString(Path.of(pathPrivateKeyRSA));
+        JWK jwk = JWK.parseFromPEMEncodedObjects(conteudo);
+        return jwk.toRSAKey().toRSAPrivateKey();
     }
 
     private void salvarRSAKey(RSAKey rsaKey) throws Exception {
@@ -154,7 +137,7 @@ public class JwtConfiguration {
         salvarRsaId(rsaKey);
     }
 
-    private String formataPemRSA(String tipoChave, String base64){
+    private String formataPemRSA(String tipoChave, String base64) {
         StringBuilder pem = new StringBuilder();
 
         pem.append("-----BEGIN ").append(tipoChave).append("-----\n");

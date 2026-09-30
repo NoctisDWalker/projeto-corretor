@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -28,6 +30,9 @@ public class SecurityConfiguration {
                     authorize.requestMatchers("/auth/**").permitAll().anyRequest().authenticated();
                 })
                 .cors(Customizer.withDefaults())
+                .oauth2ResourceServer(oauth2RS -> {
+                    oauth2RS.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()));
+                })
                 .build();
     }
 
@@ -40,6 +45,20 @@ public class SecurityConfiguration {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
             throws Exception{
         return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter  jwtAuthenticationConverter(){
+
+        JwtGrantedAuthoritiesConverter authoritiesConverter
+                = new JwtGrantedAuthoritiesConverter();
+        authoritiesConverter.setAuthorityPrefix("");
+        authoritiesConverter.setAuthoritiesClaimName("roles");
+
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+
+        return converter;
     }
 
 }
