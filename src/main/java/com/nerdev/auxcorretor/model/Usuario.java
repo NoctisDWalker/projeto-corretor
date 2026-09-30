@@ -41,7 +41,7 @@ public class Usuario {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "perfis_usuario", joinColumns = @JoinColumn(name = "usuario_id"))
     @Enumerated(EnumType.STRING)
-    Set <PerfilUsuarioEnum> perfilUsuario;
+    Set<PerfilUsuarioEnum> perfilUsuario;
 
     @Column(nullable = false, updatable = false)
     @CreatedDate

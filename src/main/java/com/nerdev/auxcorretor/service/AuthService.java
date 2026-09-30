@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -126,7 +127,7 @@ public class AuthService {
         return Usuario.builder()
                 .conta(conta)
                 .nomeExibicao(dto.nomeExibicao())
-                .perfilUsuario(PerfilUsuarioEnum.CORRETOR)
+                .perfilUsuario(Set.of(PerfilUsuarioEnum.ROLE_CORRETOR_INDIVIDUAL))
                 .build();
     }
 
