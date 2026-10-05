@@ -21,17 +21,23 @@ public class ClientApiService {
     private final ClientApiMapper clientApiMapper;
 
     public ClientApiResponseDTO save(ClientApiRequestDTO dto) {
-       if (clientRepository.existsByClientId(dto.clientId())){
-           throw new BusinessException("Client com id " + dto.clientId() + " ja existe");
-       }
+        if (clientRepository.existsByClientId(dto.clientId())){
+            throw new BusinessException("Client com id " + dto.clientId() + " ja existe");
+        }
 
-        String senhaCriptografada = passwordEncoder.encode(dto.clientSecret());
         Client clientApi = clientApiMapper.toEntity(dto);
-        clientApi.setClientSecret(senhaCriptografada);
-        Client salvo = clientRepository.save(clientApi);
 
+        if (dto.clientSecret() != null && !dto.clientSecret().trim().isEmpty()) {
+            String senhaCriptografada = passwordEncoder.encode(dto.clientSecret());
+            clientApi.setClientSecret(senhaCriptografada);
+        } else {
+            clientApi.setClientSecret(null);
+        }
+
+        Client salvo = clientRepository.save(clientApi);
         return clientApiMapper.toDto(salvo);
     }
+
 
     public Client findByClientId(String clientId) {
         return clientRepository.findByClientId(clientId)

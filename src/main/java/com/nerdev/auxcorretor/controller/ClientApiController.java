@@ -15,7 +15,7 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/ClientApi")
+@RequestMapping("/auth/clients")
 public class ClientApiController {
 
     private final ClientApiService clientApiService;
