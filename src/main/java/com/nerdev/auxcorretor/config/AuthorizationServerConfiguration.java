@@ -16,13 +16,11 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,25 +30,26 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuthorizationServerConfiguration {
 
-    private final AuthenticationEntryPoint authenticationEntryPoint;
-
     @Bean
     @Order(1)
-    public SecurityFilterChain authSecurityFilterChain (HttpSecurity http) throws Exception {
+    public SecurityFilterChain authSecurityFilterChain(HttpSecurity http) throws Exception {
 
         OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer =
                 new OAuth2AuthorizationServerConfigurer();
 
         http
-                .securityMatcher(oAuth2AuthorizationServerConfigurer.getEndpointsMatcher())
-                .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+                .securityMatcher(request -> oAuth2AuthorizationServerConfigurer.getEndpointsMatcher()
+                        .matches(request) || request.getRequestURI().equals("/login"))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/login").permitAll()
+                        .anyRequest().authenticated())
                 .csrf(csrfConfigurer -> csrfConfigurer.ignoringRequestMatchers(
                         oAuth2AuthorizationServerConfigurer.getEndpointsMatcher()
                 ))
                 .with(oAuth2AuthorizationServerConfigurer, authorizationServer -> {
                     authorizationServer.oidc(Customizer.withDefaults());
                 })
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
+                .formLogin(fromLogin -> fromLogin.loginPage("/login").permitAll())
                 .cors(Customizer.withDefaults());
 
         return http.build();
@@ -66,7 +65,7 @@ public class AuthorizationServerConfiguration {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH" ,"OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
 
@@ -92,8 +91,7 @@ public class AuthorizationServerConfiguration {
                 }
                 if (OidcParameterNames.ID_TOKEN.equals(tokenType)) {
                     context.getClaims()
-                            .claim("user_id", custonAuth.getUsuario().getId())
-                            .claim("user_name", custonAuth.getUsuario().getNomeExibicao());
+                            .claim("user_name", custonAuth.getUsuario().nomeExibicao());
                 }
             }
         };

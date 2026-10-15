@@ -1,8 +1,5 @@
 package com.nerdev.auxcorretor.security;
 
-import com.nerdev.auxcorretor.model.CredencialUsuario;
-import com.nerdev.auxcorretor.model.Usuario;
-import com.nerdev.auxcorretor.model.enums.ProviderTypeEnum;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -10,22 +7,20 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public class CustomAuthentication implements Authentication {
 
-    private final Usuario usuario;
-    private final CredencialUsuario credencialUsuario;
+    private final UsuarioAutenticado usuario;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.usuario
-                .getPerfilUsuario()
+                .perfilUsuario()
                 .stream()
-                .map(perfil -> new SimpleGrantedAuthority(perfil.name()))
-                .collect(Collectors.toList());
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 
     @Override
@@ -55,8 +50,6 @@ public class CustomAuthentication implements Authentication {
 
     @Override
     public String getName() {
-        ProviderTypeEnum providerType = credencialUsuario.getProviderType();
-        String providerUserId = credencialUsuario.getProviderUserId();
-        return (providerType.name() + ":" + providerUserId);
+        return usuario.id().toString();
     }
 }

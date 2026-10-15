@@ -1,7 +1,5 @@
 package com.nerdev.auxcorretor.controller;
 
-import com.nerdev.auxcorretor.dto.auth.AuthResponseDTO;
-import com.nerdev.auxcorretor.dto.auth.LoginRequestDTO;
 import com.nerdev.auxcorretor.dto.auth.RegistrarCorretorRequestDTO;
 import com.nerdev.auxcorretor.dto.auth.RegistrarCorretorResponseDTO;
 import com.nerdev.auxcorretor.model.enums.ProviderTypeEnum;
@@ -25,12 +23,6 @@ public class AuthenticationController {
     private final AuthService authService;
     private final RestLocationBuilder restLocationBuilder;
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody @Valid LoginRequestDTO loginDto) {
-
-        AuthResponseDTO login = authService.login(loginDto);
-        return ResponseEntity.ok(login);
-    }
 
     @PostMapping("/registrar/corretor")
     public ResponseEntity<RegistrarCorretorResponseDTO> registrarCorretorPadrao(

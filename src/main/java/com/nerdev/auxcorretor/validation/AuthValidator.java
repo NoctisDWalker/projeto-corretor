@@ -1,30 +1,20 @@
 package com.nerdev.auxcorretor.validation;
 
-import com.nerdev.auxcorretor.exception.BusinessException;
-import com.nerdev.auxcorretor.model.CredencialUsuario;
+import com.nerdev.auxcorretor.model.Usuario;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AuthValidator {
 
 
-   public void validaLogin(CredencialUsuario credencial){
-       validaUsuarioAtivo(credencial);
-       validaConta(credencial);
+   public void validaLogin(Usuario usuario){
+       validaUsuarioAtivo(usuario);
    }
 
-    private void validaUsuarioAtivo(CredencialUsuario credencial) {
-        if (!credencial.getUsuario().estaAtivo()) {
-            throw new BusinessException("Usuario inativo");
+    private void validaUsuarioAtivo(Usuario usuario) {
+        if (!usuario.estaAtivo()) {
+            throw new DisabledException("Usuário e/ou senha incorretos!");
         }
     }
-
-    private void validaConta(CredencialUsuario credencial) {
-        // Todo: pensar como implementar
-
-        if (credencial.getUsuario().getConta() == null) {
-            throw new BusinessException("Usuário sem conta vinculada");
-        }
-    }
-
 }

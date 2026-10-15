@@ -1,28 +1,19 @@
 package com.nerdev.auxcorretor.service;
 
-import com.nerdev.auxcorretor.dto.auth.AuthResponseDTO;
-import com.nerdev.auxcorretor.dto.auth.LoginRequestDTO;
 import com.nerdev.auxcorretor.dto.auth.RegistrarCorretorRequestDTO;
 import com.nerdev.auxcorretor.dto.auth.RegistrarCorretorResponseDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
-import com.nerdev.auxcorretor.mapper.AuthMapper;
 import com.nerdev.auxcorretor.model.*;
 import com.nerdev.auxcorretor.model.enums.PapelCorretorContaEnum;
 import com.nerdev.auxcorretor.model.enums.PerfilUsuarioEnum;
 import com.nerdev.auxcorretor.model.enums.ProviderTypeEnum;
 import com.nerdev.auxcorretor.repository.*;
-import com.nerdev.auxcorretor.security.CustomAuthentication;
-import com.nerdev.auxcorretor.validation.AuthValidator;
 import com.nerdev.auxcorretor.validation.RegistrarCorretorValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
 @Service
@@ -30,9 +21,7 @@ import java.util.Set;
 public class AuthService {
 
     private final PasswordEncoder encoder;
-    private final AuthValidator authValidator;
     private final RegistrarCorretorValidator registrarCorretorValidator;
-    private final AuthenticationManager authenticationManager;
 
     private final CredencialUsuarioRepository credUserRepository;
     private final ContaRepository contaRepository;
@@ -40,21 +29,6 @@ public class AuthService {
     private final CorretorRepository corretorRepository;
     private final CorretorContaRepository corretorContaRepository;
 
-    public AuthResponseDTO login(LoginRequestDTO loginRequestDTO) {
-
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken
-                (loginRequestDTO.login(), loginRequestDTO.senha());
-
-        Authentication authentication = authenticationManager.authenticate(token);
-        CustomAuthentication customAuthentication = (CustomAuthentication) authentication;
-
-        CredencialUsuario credencial = customAuthentication.getCredencialUsuario();
-
-        authValidator.validaLogin(credencial);
-        CredencialUsuario credencialAtualizada = atualizaUltimoLogin(credencial);
-
-        return AuthMapper.fromAuth(credencialAtualizada);
-    }
 
     @Transactional
     public RegistrarCorretorResponseDTO registrarCorretor(RegistrarCorretorRequestDTO registrarCorretorRequestDTO, ProviderTypeEnum providerType) {
@@ -131,10 +105,6 @@ public class AuthService {
                 .build();
     }
 
-    private CredencialUsuario atualizaUltimoLogin(CredencialUsuario credencial) {
-        credencial.setLastLoginAt(LocalDateTime.now());
-        return credUserRepository.save(credencial);
-    }
 
     private String criptografarSenha(String senha) {
         return encoder.encode(senha);
