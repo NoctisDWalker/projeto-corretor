@@ -53,7 +53,6 @@ public class AtendimentoController {
     @GetMapping("/pesquisa")
     public ResponseEntity<Page<AtendimentoFindResponseDTO>> pesquisaAtendimentos(
             @RequestParam(value = "id-cliente", required = false) UUID idCliente,
-            @RequestParam(value = "id-corretor", required = false) UUID idCorretor,
             @RequestParam(value = "status-atendimento", required = false) StatusAtendimentoEnum statusAtendimento,
             @RequestParam(value = "menor-data-cadastro", required = false) LocalDate menorDataCadastro,
             @RequestParam(value = "maior-data-cadastro", required = false) LocalDate maiorDataCadastro,
@@ -63,7 +62,7 @@ public class AtendimentoController {
             @RequestParam(value = "tamanho", defaultValue = "10") Integer tamanho
     ) {
         Page<AtendimentoFindResponseDTO> resultado = atendimentoService.pesquisaAtendimento(
-                idCliente, idCorretor, statusAtendimento, menorDataCadastro, maiorDataCadastro,
+                idCliente, statusAtendimento, menorDataCadastro, maiorDataCadastro,
                 menorDataFim, maiorDataFim, pagina, tamanho
         );
         return  ResponseEntity.ok(resultado);

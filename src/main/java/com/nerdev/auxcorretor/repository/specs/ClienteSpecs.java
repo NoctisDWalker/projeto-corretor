@@ -4,7 +4,13 @@ import com.nerdev.auxcorretor.model.Cliente;
 import com.nerdev.auxcorretor.model.enums.StatusClienteEnum;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.UUID;
+
 public class ClienteSpecs {
+
+    public static Specification<Cliente> idCorretorEquals(UUID id) {
+        return (root, query, cb) -> cb.equal(root.get("corretor").get("id"), id);
+    }
 
     public static Specification<Cliente> nomeLike(String nome) {
         return (root, query, cb) -> cb.like(cb.upper(root.get("nome")), "%" + nome.toUpperCase() + "%");

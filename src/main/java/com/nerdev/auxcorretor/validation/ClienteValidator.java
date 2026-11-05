@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @AllArgsConstructor
@@ -17,15 +18,15 @@ public class ClienteValidator {
 
     private ClienteRepository clienteRepository;
 
-    public void validaSalvar(Cliente cliente) {
+    public void validaSalvar(Cliente cliente, UUID corretorId) {
         verificarCamposObrigatorios(cliente);
-        verificarEmailDuplicado(cliente);
-        verificarCpfDuplicado(cliente);
+        verificarEmailDuplicado(cliente, corretorId);
+        verificarCpfDuplicado(cliente, corretorId);
     }
 
-    public void validaAtualizar(Cliente cliente) {
-        verificarEmailDuplicado(cliente);
-        verificarCpfDuplicado(cliente);
+    public void validaAtualizar(Cliente cliente, UUID corretorId) {
+        verificarEmailDuplicado(cliente, corretorId);
+        verificarCpfDuplicado(cliente, corretorId);
     }
 
     public void validaDeletar(Cliente cliente) {
@@ -33,19 +34,26 @@ public class ClienteValidator {
         verificarStatusAtual(cliente);
     }
 
-    private void verificarEmailDuplicado(Cliente cliente) {
+    private void verificarEmailDuplicado(Cliente cliente, UUID corretorId) {
+        if (isNullOrBlank(cliente.getEmail())) {
+            return;
+        }
         Optional<Cliente> clienteEncontrado = clienteRepository
-                .findByEmail(cliente.getEmail());
+                .findByEmailAndCorretorId(cliente.getEmail(), corretorId);
         validaUnico(clienteEncontrado, cliente);
     }
-    private void verificarCpfDuplicado(Cliente cliente) {
+
+    private void verificarCpfDuplicado(Cliente cliente, UUID corretorId) {
+        if (isNullOrBlank(cliente.getCpf())) {
+            return;
+        }
         Optional<Cliente> clienteEncontrado = clienteRepository
-                .findByCpf(cliente.getCpf());
+                .findByCpfAndCorretorId(cliente.getCpf(), corretorId);
         validaUnico(clienteEncontrado, cliente);
     }
 
     private void verificarCamposObrigatorios(Cliente cliente) {
-        if (isNullOrBlank(cliente.getNome()) || isNullOrBlank(cliente.getTelefone())){
+        if (isNullOrBlank(cliente.getNome()) || isNullOrBlank(cliente.getTelefone())) {
             throw new RequiredFieldException("Campos obrigatórios não informados.");
         }
     }
@@ -60,7 +68,7 @@ public class ClienteValidator {
         return (campo == null || campo.isBlank());
     }
 
-    private void validaUnico(Optional<Cliente> clienteEncontrado, Cliente cliente){
+    private void validaUnico(Optional<Cliente> clienteEncontrado, Cliente cliente) {
         if (cliente.getId() == null && clienteEncontrado.isPresent()) {
             throw new DuplicateEntityException("Dados informados já estão em uso.");
         }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ImovelRepository extends JpaRepository<Imovel, UUID>, JpaSpecificationExecutor<Imovel> {
@@ -28,5 +29,7 @@ public interface ImovelRepository extends JpaRepository<Imovel, UUID>, JpaSpecif
     @Override
     @EntityGraph(attributePaths = {"corretorResponsavel"})
     Page<Imovel> findAll(Specification<Imovel> spec, Pageable pageable);
+
+    Optional<Imovel> findByIdAndCorretorResponsavelId(UUID id, UUID corretorResponsavelId);
 
 }

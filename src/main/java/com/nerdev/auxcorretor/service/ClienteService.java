@@ -5,8 +5,10 @@ import com.nerdev.auxcorretor.dto.cliente.ClienteFindResponseDto;
 import com.nerdev.auxcorretor.dto.cliente.ClienteResponseDTO;
 import com.nerdev.auxcorretor.dto.cliente.ClienteUpdateRequestDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
+import com.nerdev.auxcorretor.exception.NotFoundException;
 import com.nerdev.auxcorretor.mapper.ClienteMapper;
 import com.nerdev.auxcorretor.model.Cliente;
+import com.nerdev.auxcorretor.model.Corretor;
 import com.nerdev.auxcorretor.model.enums.StatusClienteEnum;
 import com.nerdev.auxcorretor.repository.ClienteRepository;
 import com.nerdev.auxcorretor.repository.specs.ClienteSpecs;
@@ -18,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import static com.nerdev.auxcorretor.repository.specs.ClienteSpecs.*;
 
 import java.util.UUID;
 
@@ -29,27 +30,34 @@ public class ClienteService {
     private ClienteRepository clienteRepository;
     private ClienteMapper clienteMapper;
     private ClienteValidator clienteValidator;
+    private ServiceUtils serviceUtils;
 
     public ClienteResponseDTO salvar(ClienteCreateRequestDTO dto){
+        Corretor corretor = getCorretorLogado();
         Cliente cliente = clienteMapper.toEntity(dto);
-        clienteValidator.validaSalvar(cliente);
-        cliente.setStatusCliente(StatusClienteEnum.ATIVO);
+        prepararNovoCliente(cliente, corretor);
+        clienteValidator.validaSalvar(cliente, corretor.getId());
+
         Cliente clienteSalvo = clienteRepository.save(cliente);
         return clienteMapper.toDto(clienteSalvo);
     }
 
     public ClienteResponseDTO atualizar(UUID id , ClienteUpdateRequestDTO dto){
-        Cliente clienteEncontrado = clienteRepository.findById(id).orElseThrow(() -> new BusinessException("Cliente não Encontrado"));
+        Corretor corretorLogado = getCorretorLogado();
+        Cliente clienteEncontrado = clienteRepository.findByIdAndCorretorId(id, corretorLogado.getId())
+                .orElseThrow(() -> new NotFoundException("Cliente não encontrado"));
 
         clienteMapper.updateEntity(clienteEncontrado, dto);
-        clienteValidator.validaAtualizar(clienteEncontrado);
+
+        clienteValidator.validaAtualizar(clienteEncontrado, corretorLogado.getId());
         Cliente clienteAtualizado = clienteRepository.save(clienteEncontrado);
         return clienteMapper.toDto(clienteAtualizado);
     }
 
     public void deletar(UUID id){
-        Cliente clienteEncontrado = clienteRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Cliente não Encontrado"));
+        Corretor corretorLogado = getCorretorLogado();
+        Cliente clienteEncontrado = clienteRepository.findByIdAndCorretorId(id, corretorLogado.getId())
+                .orElseThrow(() -> new NotFoundException("Cliente não encontrado"));
 
         clienteValidator.validaDeletar(clienteEncontrado);
 
@@ -58,8 +66,10 @@ public class ClienteService {
     }
 
     public ClienteResponseDTO reativarCliente(UUID id){
-        Cliente clienteEncontrado = clienteRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Cliente não Encontrado"));
+        Corretor corretorLogado = getCorretorLogado();
+        Cliente clienteEncontrado = clienteRepository.findByIdAndCorretorId(id, corretorLogado.getId())
+                .orElseThrow(() -> new NotFoundException("Cliente não encontrado"));
+
         if (clienteEncontrado.getStatusCliente() != StatusClienteEnum.INATIVO){
             throw new BusinessException("Somente clientes com status INATIVO podem ser reativados.");
         }
@@ -79,7 +89,10 @@ public class ClienteService {
             Integer tamanho
     ){
 
+        Corretor corretorLogado = getCorretorLogado();
+
         Specification<Cliente> spec = new SpecificationBuilder<Cliente>()
+                .and(corretorLogado.getId(), ClienteSpecs::idCorretorEquals)
                 .andIfNotBlank(nome, ClienteSpecs::nomeLike)
                 .andIfNotBlank(cpf, ClienteSpecs::cpfLike)
                 .andIfNotBlank(telefone, ClienteSpecs::telefoneLike)
@@ -92,5 +105,15 @@ public class ClienteService {
         Page<Cliente> page = clienteRepository.findAll(spec, pageable);
 
         return page.map(clienteMapper::toFindDto);
+    }
+
+
+    private Corretor getCorretorLogado() {
+        return serviceUtils.obterCorretorLogado();
+    }
+
+    private void prepararNovoCliente(Cliente cliente, Corretor corretor) {
+        cliente.setStatusCliente(StatusClienteEnum.ATIVO);
+        cliente.setCorretor(corretor);
     }
 }

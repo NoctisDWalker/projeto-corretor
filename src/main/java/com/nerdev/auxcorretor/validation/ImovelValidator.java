@@ -1,11 +1,8 @@
 package com.nerdev.auxcorretor.validation;
 
 import com.nerdev.auxcorretor.exception.BusinessException;
-import com.nerdev.auxcorretor.model.Corretor;
 import com.nerdev.auxcorretor.model.Imovel;
 import com.nerdev.auxcorretor.model.enums.StatusImovelEnum;
-import com.nerdev.auxcorretor.repository.CorretorRepository;
-import com.nerdev.auxcorretor.repository.ImovelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,28 +10,23 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ImovelValidator {
 
-    private final ImovelRepository imovelRepository;
-    private final CorretorRepository corretorRepository;
 
     public void validaCadastroImovel(Imovel imovel) {
         camposObrigatoriosCreate(imovel);
         validaStatusCriacao(imovel);
     }
 
-    public void validaAtualizar(Imovel imovelPersistido, Imovel imovelAtualizado, Corretor corretor) {
-        validaCorretorResponsavel(imovelPersistido, corretor);
+    public void validaAtualizar(Imovel imovelPersistido, Imovel imovelAtualizado) {
         validarMudancaStatus(imovelPersistido, imovelAtualizado);
     }
 
-    public void validaInativar(Imovel imovel, Corretor corretor) {
-        validaCorretorResponsavel(imovel, corretor);
+    public void validaInativar(Imovel imovel) {
         if (!imovel.getStatusImovel().podeTransicionarPara(StatusImovelEnum.INATIVO)){
             throw new BusinessException("Imovel não pode ser cancelada no status atual.");
         }
     }
 
-    public void validaReativar(Imovel imovel, Corretor corretor) {
-        validaCorretorResponsavel(imovel, corretor);
+    public void validaReativar(Imovel imovel) {
         if (!imovel.getStatusImovel().podeTransicionarPara(StatusImovelEnum.DISPONIVEL)){
             throw new BusinessException("Imóvel não pode ser inativado no status atual.");
         }
@@ -59,11 +51,6 @@ public class ImovelValidator {
         return (valor == null || valor.isBlank());
     }
 
-    private void validaCorretorResponsavel(Imovel imovelPersistido ,Corretor corretor) {
-       if(!imovelPersistido.getCorretorResponsavel().getId().equals(corretor.getId())){
-           throw new BusinessException("Corretor não é o responsavel pelo imovel");
-       }
-    }
 
     private void validarMudancaStatus(Imovel imovelPersistido, Imovel imovelAtualizado) {
 

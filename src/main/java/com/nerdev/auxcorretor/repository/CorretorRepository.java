@@ -13,6 +13,7 @@ import java.util.UUID;
 public interface CorretorRepository extends JpaRepository<Corretor, UUID>, JpaSpecificationExecutor<Corretor> {
 
     Optional<Corretor> findByCreci(String creci);
+    Optional<Corretor> findByUsuarioId(UUID usuarioId);
     boolean existsByCreci(String cresci);
     boolean existsByCpf(String cpf);
 }

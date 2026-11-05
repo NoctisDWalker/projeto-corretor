@@ -4,14 +4,13 @@ import com.nerdev.auxcorretor.dto.imovel.ImovelCreateRequestDTO;
 import com.nerdev.auxcorretor.dto.imovel.ImovelFindResponseDTO;
 import com.nerdev.auxcorretor.dto.imovel.ImovelResponseDTO;
 import com.nerdev.auxcorretor.dto.imovel.ImovelUpdateRequestDTO;
-import com.nerdev.auxcorretor.exception.BusinessException;
+import com.nerdev.auxcorretor.exception.NotFoundException;
 import com.nerdev.auxcorretor.mapper.ImovelMapper;
 import com.nerdev.auxcorretor.model.Corretor;
 import com.nerdev.auxcorretor.model.Imovel;
 import com.nerdev.auxcorretor.model.enums.FinalidadeImovelEnum;
 import com.nerdev.auxcorretor.model.enums.StatusImovelEnum;
 import com.nerdev.auxcorretor.model.enums.TipoImovelEnum;
-import com.nerdev.auxcorretor.repository.CorretorRepository;
 import com.nerdev.auxcorretor.repository.ImovelRepository;
 import com.nerdev.auxcorretor.repository.specs.ImovelSpecs;
 import com.nerdev.auxcorretor.repository.specs.SpecificationBuilder;
@@ -23,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import static com.nerdev.auxcorretor.repository.specs.ImovelSpecs.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -37,10 +35,10 @@ public class ImovelService {
     private final ImovelRepository imovelRepository;
     private final ImovelMapper imovelMapper;
     private final ImovelValidator imovelValidator;
-    private final CorretorRepository corretorRepository;
+    private final ServiceUtils serviceUtils;
 
     public ImovelResponseDTO salvar(ImovelCreateRequestDTO createRequestDTO) {
-        Corretor corretorLogado = buscaCorretorLogado();
+        Corretor corretorLogado = getCorretor();
 
         Imovel imovelEntity = imovelMapper.toEntity(createRequestDTO);
         prepararNovoImovel(imovelEntity, corretorLogado);
@@ -51,13 +49,13 @@ public class ImovelService {
     }
 
     public ImovelResponseDTO atualizar(UUID idImovel, ImovelUpdateRequestDTO updateRequestDTO) {
-        Corretor corretorLogado = buscaCorretorLogado();
+        Corretor corretorLogado = getCorretor();
 
-        Imovel imovelPersistido = imovelRepository.findById(idImovel)
-                .orElseThrow(() -> new BusinessException("Imovel não encontrado"));
+        Imovel imovelPersistido = imovelRepository.findByIdAndCorretorResponsavelId(idImovel, corretorLogado.getId())
+                .orElseThrow(() -> new NotFoundException("Imovel não encontrado"));
 
         Imovel imovelAtualizado = imovelMapper.cloneEntity(updateRequestDTO);
-        imovelValidator.validaAtualizar(imovelPersistido, imovelAtualizado, corretorLogado);
+        imovelValidator.validaAtualizar(imovelPersistido, imovelAtualizado);
 
         imovelMapper.updateEntity(imovelPersistido, updateRequestDTO);
         Imovel atualizado = imovelRepository.save(imovelPersistido);
@@ -66,33 +64,34 @@ public class ImovelService {
     }
 
     public void inativar(UUID idImovel) {
-        Corretor corretorLogado = buscaCorretorLogado();
-        Imovel imovelPersistido = imovelRepository.findById(idImovel)
-                .orElseThrow(() -> new BusinessException("Imovel não encontrado"));
+        Corretor corretorLogado = getCorretor();
+        Imovel imovelPersistido = imovelRepository.findByIdAndCorretorResponsavelId(idImovel, corretorLogado.getId())
+                .orElseThrow(() -> new NotFoundException("Imovel não encontrado"));
 
-        imovelValidator.validaInativar(imovelPersistido, corretorLogado);
+        imovelValidator.validaInativar(imovelPersistido);
         imovelPersistido.setStatusImovel(StatusImovelEnum.INATIVO);
         imovelRepository.save(imovelPersistido);
     }
 
     public void reativar(UUID idImovel) {
-        Corretor corretorLogado = buscaCorretorLogado();
-        Imovel imovelPersistido = imovelRepository.findById(idImovel)
-                .orElseThrow(() -> new BusinessException("Imovel não encontrado"));
+        Corretor corretorLogado = getCorretor();
+        Imovel imovelPersistido = imovelRepository.findByIdAndCorretorResponsavelId(idImovel, corretorLogado.getId())
+                .orElseThrow(() -> new NotFoundException("Imovel não encontrado"));
 
-        imovelValidator.validaReativar(imovelPersistido, corretorLogado);
+        imovelValidator.validaReativar(imovelPersistido);
         imovelPersistido.setStatusImovel(StatusImovelEnum.DISPONIVEL);
         imovelRepository.save(imovelPersistido);
     }
 
     public ImovelResponseDTO buscarPorId(UUID idImovel) {
-        Imovel imovelEncontrado = imovelRepository.findById(idImovel)
-                .orElseThrow(() -> new BusinessException("Imovel não encontrado"));
+        Corretor corretorLogado = getCorretor();
+        Imovel imovelEncontrado = imovelRepository.findByIdAndCorretorResponsavelId(idImovel, corretorLogado.getId())
+                .orElseThrow(() -> new NotFoundException("Imovel não encontrado"));
         return imovelMapper.toDTO(imovelEncontrado);
     }
 
     public List<ImovelResponseDTO> buscarMeusImoveis() {
-        Corretor corretorLogado = buscaCorretorLogado();
+        Corretor corretorLogado = getCorretor();
         List<Imovel> imoveis = imovelRepository.findByCorretorResponsavelId(corretorLogado.getId());
 
         return imoveis.stream().map(imovelMapper::toDTO).toList();
@@ -101,19 +100,6 @@ public class ImovelService {
     public List<ImovelResponseDTO> listarTodosImoveis() {
         List<Imovel> imoveis = imovelRepository.findAll();
         return imoveis.stream().map(imovelMapper::toDTO).toList();
-    }
-
-    private void prepararNovoImovel(Imovel imovelEntity, Corretor corretorLogado) {
-        imovelEntity.setStatusImovel(StatusImovelEnum.DISPONIVEL);
-        imovelEntity.setCorretorResponsavel(corretorLogado);
-        imovelEntity.setQuantidadeVisitas(0);
-    }
-
-    private Corretor buscaCorretorLogado() {
-        String idCorretor = "b1452570-2e78-4487-8c40-b90de9b79dac";
-        Corretor corretorLogado = corretorRepository.findById(UUID.fromString(idCorretor))
-                .orElseThrow(() -> new BusinessException("Corretor não encontrado"));
-        return corretorLogado;
     }
 
     public Page<ImovelFindResponseDTO> pesquisaImovel(
@@ -125,12 +111,14 @@ public class ImovelService {
             String cidade,
             String bairro,
             StatusImovelEnum statusImovel,
-            UUID corretorResponsavelId,
             LocalDate dataCadastroInicial,
             LocalDate dataCadastroFinal,
             Integer pagina,
             Integer tamanho
-    ){
+    ) {
+
+        Corretor corretorLogado = getCorretor();
+
         Specification<Imovel> spec = new SpecificationBuilder<Imovel>()
                 .andIfNotBlank(titulo, ImovelSpecs::tituloLike)
                 .and(valorMinimo, ImovelSpecs::valorMinimo)
@@ -140,7 +128,7 @@ public class ImovelService {
                 .andIfNotBlank(cidade, ImovelSpecs::cidadeLike)
                 .andIfNotBlank(bairro, ImovelSpecs::bairroLike)
                 .and(statusImovel, ImovelSpecs::statusEquals)
-                .and(corretorResponsavelId, ImovelSpecs::corretorResponsavelEquals)
+                .and(corretorLogado.getId(), ImovelSpecs::corretorResponsavelEquals)
                 .and(dataCadastroInicial, ImovelSpecs::dataCadastroInicial)
                 .and(dataCadastroFinal, ImovelSpecs::dataCadastroFinal)
                 .build();
@@ -149,5 +137,15 @@ public class ImovelService {
         Page<Imovel> page = imovelRepository.findAll(spec, pageable);
 
         return page.map(imovelMapper::toFindDTO);
+    }
+
+    private void prepararNovoImovel(Imovel imovelEntity, Corretor corretorLogado) {
+        imovelEntity.setStatusImovel(StatusImovelEnum.DISPONIVEL);
+        imovelEntity.setCorretorResponsavel(corretorLogado);
+        imovelEntity.setQuantidadeVisitas(0);
+    }
+
+    private Corretor getCorretor() {
+        return serviceUtils.obterCorretorLogado();
     }
 }

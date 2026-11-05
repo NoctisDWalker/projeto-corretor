@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface AtendimentoRepository extends JpaRepository<Atendimento, UUID>, JpaSpecificationExecutor<Atendimento> {
@@ -22,6 +23,8 @@ public interface AtendimentoRepository extends JpaRepository<Atendimento, UUID>,
             Cliente cliente,
             List<StatusAtendimentoEnum> statusFinais
     );
+
+    Optional<Atendimento> findByIdAndCorretorId(UUID id, UUID corretorId);
 
     @Override
     @EntityGraph(attributePaths = {"corretor", "cliente"})

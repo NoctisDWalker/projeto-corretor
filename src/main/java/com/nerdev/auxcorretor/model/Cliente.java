@@ -24,6 +24,10 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @JoinColumn(name = "corretor_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Corretor corretor;
+
     @Column(nullable = false)
     private String nome;
 

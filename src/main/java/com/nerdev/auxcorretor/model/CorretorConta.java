@@ -32,6 +32,8 @@ public class CorretorConta {
     @ManyToOne(fetch = FetchType.LAZY)
     private Conta conta;
 
+    @JoinColumn
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PapelCorretorContaEnum papel;

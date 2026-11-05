@@ -4,7 +4,7 @@ import com.nerdev.auxcorretor.dto.atendimento.AtendimentoCreateRequestDTO;
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoFindResponseDTO;
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoResponseDTO;
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoUpdateRequestDTO;
-import com.nerdev.auxcorretor.exception.BusinessException;
+import com.nerdev.auxcorretor.exception.NotFoundException;
 import com.nerdev.auxcorretor.mapper.AtendimentoMapper;
 import com.nerdev.auxcorretor.model.Atendimento;
 import com.nerdev.auxcorretor.model.Cliente;
@@ -12,7 +12,6 @@ import com.nerdev.auxcorretor.model.Corretor;
 import com.nerdev.auxcorretor.model.enums.StatusAtendimentoEnum;
 import com.nerdev.auxcorretor.repository.AtendimentoRepository;
 import com.nerdev.auxcorretor.repository.ClienteRepository;
-import com.nerdev.auxcorretor.repository.CorretorRepository;
 import com.nerdev.auxcorretor.repository.specs.AtendimentoSpecs;
 import com.nerdev.auxcorretor.repository.specs.SpecificationBuilder;
 import com.nerdev.auxcorretor.validation.AtendimentoValidator;
@@ -33,62 +32,64 @@ import java.util.UUID;
 public class AtendimentoService {
 
     private final AtendimentoRepository atendimentoRepository;
-    private final CorretorRepository corretorRepository;
     private final ClienteRepository clienteRepository;
     private final AtendimentoMapper atendimentoMapper;
     private final AtendimentoValidator atendimentoValidator;
+    private final ServiceUtils serviceUtils;
 
-    public AtendimentoResponseDTO salvar(AtendimentoCreateRequestDTO createDto){
-        // Todo: Atualizar metodo apos implementação da autenticação
+    public AtendimentoResponseDTO salvar(AtendimentoCreateRequestDTO createDto) {
         Atendimento atendimento = atendimentoMapper.toEntity(createDto);
 
-        final Corretor corretor = corretorRepository.findById(createDto.idCorretor())
-                .orElseThrow(() -> new BusinessException("Corretor não encontrado."));
-        final Cliente cliente = clienteRepository.findById(createDto.idCliente())
-                .orElseThrow(() -> new BusinessException("Cliente não encontrado."));
+        Corretor corretorLogado = getCorretorLogado();
+        final Cliente cliente = clienteRepository.findByIdAndCorretorId(createDto.idCliente(), corretorLogado.getId())
+                .orElseThrow(() -> new NotFoundException("Cliente não encontrado."));
 
-        atendimento.setCorretor(corretor);
-        atendimento.setCliente(cliente);
-        atendimento.setStatusAtendimento(StatusAtendimentoEnum.NOVO_LEAD);
+
+        prepararNovoAtendimento(atendimento, corretorLogado, cliente);
         atendimentoValidator.validaSalvar(atendimento);
         Atendimento salvo = atendimentoRepository.save(atendimento);
 
         return atendimentoMapper.toDTO(salvo);
     }
 
-    public AtendimentoResponseDTO atualizar(UUID id, AtendimentoUpdateRequestDTO updateDTO){
-        Atendimento atendimentoEncontrado = atendimentoRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Atendimento não encontrado"));
+    public AtendimentoResponseDTO atualizar(UUID id, AtendimentoUpdateRequestDTO updateDTO) {
+
+        Corretor corretorLogado = getCorretorLogado();
+        Atendimento atendimentoEncontrado = atendimentoRepository.findByIdAndCorretorId(id, corretorLogado.getId())
+                .orElseThrow(() -> new NotFoundException("Atendimento não encontrado"));
 
         atendimentoValidator.validaAtualizar(atendimentoEncontrado);
         StatusAtendimentoEnum statusAnterior = atendimentoEncontrado.getStatusAtendimento();
         atendimentoMapper.updateEntity(atendimentoEncontrado, updateDTO);
+
+
         regraDataFim(atendimentoEncontrado, statusAnterior);
         Atendimento atualizado = atendimentoRepository.save(atendimentoEncontrado);
 
         return atendimentoMapper.toDTO(atualizado);
     }
 
-    public void deletar(UUID id){
-        Atendimento atendimento = atendimentoRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Atendimento não encontrado."));
+    public void deletar(UUID id) {
+        Corretor corretorLogado = getCorretorLogado();
+        Atendimento atendimentoEncontrado = atendimentoRepository.findByIdAndCorretorId(id, corretorLogado.getId())
+                .orElseThrow(() -> new NotFoundException("Atendimento não encontrado."));
 
-        atendimentoValidator.validaDeletar(atendimento);
-        atendimento.setStatusAtendimento(StatusAtendimentoEnum.INATIVO);
-        atendimento.setDataFim(LocalDateTime.now());
-        atendimentoRepository.save(atendimento);
+        atendimentoValidator.validaDeletar(atendimentoEncontrado);
+        atendimentoEncontrado.setStatusAtendimento(StatusAtendimentoEnum.INATIVO);
+        atendimentoEncontrado.setDataFim(LocalDateTime.now());
+        atendimentoRepository.save(atendimentoEncontrado);
     }
 
-    public AtendimentoResponseDTO buscarPorId(UUID id){
-        Atendimento atendimento = atendimentoRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Atendimento não encontrado"));
+    public AtendimentoResponseDTO buscarPorId(UUID id) {
+        Corretor corretorLogado = getCorretorLogado();
+        Atendimento atendimentoEncontrado = atendimentoRepository.findByIdAndCorretorId(id, corretorLogado.getId())
+                .orElseThrow(() -> new NotFoundException("Atendimento não encontrado"));
 
-        return atendimentoMapper.toDTO(atendimento);
+        return atendimentoMapper.toDTO(atendimentoEncontrado);
     }
 
     public Page<AtendimentoFindResponseDTO> pesquisaAtendimento(
             UUID idCliente,
-            UUID idCorretor,
             StatusAtendimentoEnum statusAtendimento,
             LocalDate menorDataCadastro,
             LocalDate maiorDataCadastro,
@@ -96,11 +97,13 @@ public class AtendimentoService {
             LocalDate maiorDataFim,
             Integer pagina,
             Integer tamanho
-    ){
+    ) {
+
+        Corretor corretorLogado = getCorretorLogado();
 
         Specification<Atendimento> spec = new SpecificationBuilder<Atendimento>()
                 .and(idCliente, AtendimentoSpecs::idClienteEquals)
-                .and(idCorretor, AtendimentoSpecs::idCorretorEquals)
+                .and(corretorLogado.getId(), AtendimentoSpecs::idCorretorEquals)
                 .and(statusAtendimento, AtendimentoSpecs::statusAtendimentoEquals)
                 .and(menorDataCadastro, AtendimentoSpecs::menorDataCadastro)
                 .and(maiorDataCadastro, AtendimentoSpecs::maiorDataCadastro)
@@ -114,15 +117,25 @@ public class AtendimentoService {
         return page.map(atendimentoMapper::toFindDTO);
     }
 
-    private void regraDataFim(Atendimento atendimento, StatusAtendimentoEnum statusAnterior){
+    private void prepararNovoAtendimento(Atendimento atendimento, Corretor corretorLogado, Cliente cliente) {
+        atendimento.setCorretor(corretorLogado);
+        atendimento.setCliente(cliente);
+        atendimento.setStatusAtendimento(StatusAtendimentoEnum.NOVO_LEAD);
+    }
+
+    private Corretor getCorretorLogado() {
+        return serviceUtils.obterCorretorLogado();
+    }
+
+    private void regraDataFim(Atendimento atendimento, StatusAtendimentoEnum statusAnterior) {
         StatusAtendimentoEnum novoStatus = atendimento.getStatusAtendimento();
         boolean eraFinal = StatusAtendimentoEnum.statusFinais().contains(statusAnterior);
         boolean virouFinal = StatusAtendimentoEnum.statusFinais().contains(novoStatus);
 
-        if(!eraFinal && virouFinal){
+        if (!eraFinal && virouFinal) {
             atendimento.setDataFim(LocalDateTime.now());
         }
-        if(eraFinal && !virouFinal){
+        if (eraFinal && !virouFinal) {
             atendimento.setDataFim(null);
         }
     }
