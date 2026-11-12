@@ -1,5 +1,6 @@
 package com.nerdev.auxcorretor.model;
 
+import com.nerdev.auxcorretor.model.enums.CompartilhamentoImovelEnum;
 import com.nerdev.auxcorretor.model.enums.FinalidadeImovelEnum;
 import com.nerdev.auxcorretor.model.enums.StatusImovelEnum;
 import com.nerdev.auxcorretor.model.enums.TipoImovelEnum;
@@ -57,6 +58,10 @@ public class Imovel {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusImovelEnum statusImovel;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CompartilhamentoImovelEnum compartilhamentoImovel;
 
     @JoinColumn(name = "corretor_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)

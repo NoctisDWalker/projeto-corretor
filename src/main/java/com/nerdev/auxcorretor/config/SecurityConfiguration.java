@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                             "/auth/**",
                             "/login",
                             "/authorized",
-                            "/").permitAll().anyRequest().authenticated();
+                            "/").permitAll().anyRequest().denyAll();
                 })
                 .cors(Customizer.withDefaults())
                 .oauth2ResourceServer(oauth2RS -> {

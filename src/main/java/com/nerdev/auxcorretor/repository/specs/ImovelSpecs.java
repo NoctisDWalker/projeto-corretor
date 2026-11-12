@@ -1,6 +1,7 @@
 package com.nerdev.auxcorretor.repository.specs;
 
 import com.nerdev.auxcorretor.model.Imovel;
+import com.nerdev.auxcorretor.model.enums.CompartilhamentoImovelEnum;
 import com.nerdev.auxcorretor.model.enums.FinalidadeImovelEnum;
 import com.nerdev.auxcorretor.model.enums.StatusImovelEnum;
 import com.nerdev.auxcorretor.model.enums.TipoImovelEnum;
@@ -29,6 +30,10 @@ public class ImovelSpecs {
         return (root, query, cb) -> cb.equal(root.get("finalidadeImovel"), finalidadeImovel);
     }
 
+    public static Specification<Imovel> compartilhamentoImovel(CompartilhamentoImovelEnum compartilhamentoImovel) {
+        return (root, query, cb) -> cb.equal(root.get("compartilhamentoImovel"), compartilhamentoImovel);
+    }
+
     public static Specification<Imovel>  tipoEquals(TipoImovelEnum tipoImovel) {
         return (root, query, cb) -> cb.equal(root.get("tipoImovel"), tipoImovel);
     }
@@ -43,6 +48,10 @@ public class ImovelSpecs {
 
     public static Specification<Imovel> statusEquals(StatusImovelEnum statusImovel) {
         return (root, query, cb) -> cb.equal(root.get("statusImovel"), statusImovel);
+    }
+
+    public static Specification<Imovel> statusNotFinalizado() {
+        return (root, query, cb) -> cb.not(root.get("statusImovel").in(StatusImovelEnum.statusFinais()));
     }
 
     public static Specification<Imovel> corretorResponsavelEquals(UUID  corretorResponsavelId) {

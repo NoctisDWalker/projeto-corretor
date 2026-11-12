@@ -2,9 +2,12 @@ package com.nerdev.auxcorretor.validation;
 
 import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.model.Imovel;
+import com.nerdev.auxcorretor.model.enums.CompartilhamentoImovelEnum;
 import com.nerdev.auxcorretor.model.enums.StatusImovelEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -21,14 +24,24 @@ public class ImovelValidator {
     }
 
     public void validaInativar(Imovel imovel) {
-        if (!imovel.getStatusImovel().podeTransicionarPara(StatusImovelEnum.INATIVO)){
+        if (!imovel.getStatusImovel().podeTransicionarPara(StatusImovelEnum.INATIVO)) {
             throw new BusinessException("Imovel não pode ser cancelada no status atual.");
         }
     }
 
     public void validaReativar(Imovel imovel) {
-        if (!imovel.getStatusImovel().podeTransicionarPara(StatusImovelEnum.DISPONIVEL)){
+        if (!imovel.getStatusImovel().podeTransicionarPara(StatusImovelEnum.DISPONIVEL)) {
             throw new BusinessException("Imóvel não pode ser inativado no status atual.");
+        }
+    }
+
+
+    public void validaVisibilidade(Imovel imovelEncontrado, UUID corretorLogado) {
+        if (imovelEncontrado.getCorretorResponsavel().getId() == corretorLogado) {
+            return;
+        }
+        if (imovelEncontrado.getStatusImovel().isFinalizado() || imovelEncontrado.getCompartilhamentoImovel() == CompartilhamentoImovelEnum.PRIVADO) {
+            throw new BusinessException("Imovel não encontra-se disponivel para visualização");
         }
     }
 
@@ -42,7 +55,7 @@ public class ImovelValidator {
     }
 
     private void validaStatusCriacao(Imovel imovel) {
-        if (!imovel.getStatusImovel().equals(StatusImovelEnum.DISPONIVEL)){
+        if (!imovel.getStatusImovel().equals(StatusImovelEnum.DISPONIVEL)) {
             throw new BusinessException("O status de criação do imovel deve ser DISPONIVEL.");
         }
     }

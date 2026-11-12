@@ -15,6 +15,10 @@ public class VisitaSpecs {
         return (root, query, cb) -> cb.equal(root.get("atendimento").get("id"), idAtendimento);
     }
 
+    public static Specification<Visita> idCorretorResponsavelEquals(UUID idCorretorResponsavel) {
+        return (root, query, cb) -> cb.equal(root.get("atendimento").get("corretor").get("id"), idCorretorResponsavel);
+    }
+
     public static Specification<Visita> idImovelEquals(UUID idImovel) {
         return (root, query, cb) -> cb.equal(root.get("imovel").get("id"), idImovel);
     }

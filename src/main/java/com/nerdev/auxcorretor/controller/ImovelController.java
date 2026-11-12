@@ -4,6 +4,7 @@ import com.nerdev.auxcorretor.dto.imovel.ImovelCreateRequestDTO;
 import com.nerdev.auxcorretor.dto.imovel.ImovelFindResponseDTO;
 import com.nerdev.auxcorretor.dto.imovel.ImovelResponseDTO;
 import com.nerdev.auxcorretor.dto.imovel.ImovelUpdateRequestDTO;
+import com.nerdev.auxcorretor.model.enums.CompartilhamentoImovelEnum;
 import com.nerdev.auxcorretor.model.enums.FinalidadeImovelEnum;
 import com.nerdev.auxcorretor.model.enums.StatusImovelEnum;
 import com.nerdev.auxcorretor.model.enums.TipoImovelEnum;
@@ -59,22 +60,35 @@ public class ImovelController {
         return imovelService.buscarPorId(id);
     }
 
-    @GetMapping("/meus")
-    public List<ImovelResponseDTO> buscarMeusImoveis() {
-        return imovelService.buscarMeusImoveis();
-    }
-
     @GetMapping("/todos")
-    public List<ImovelResponseDTO> buscarTodos() {
-        return imovelService.listarTodosImoveis();
-    }
-
-    @GetMapping("/pesquisa")
-    public ResponseEntity<Page<ImovelFindResponseDTO>> pesquisaImovel(
+    public ResponseEntity<Page<ImovelFindResponseDTO>> todos(
             @RequestParam(value = "titulo", required = false) String titulo,
             @RequestParam(value = "valor-minimo", required = false) BigDecimal valorMinimo,
             @RequestParam(value = "valor-maximo", required = false) BigDecimal valorMaximo,
             @RequestParam(value = "finalidade-imovel", required = false) FinalidadeImovelEnum finalidadeImovel,
+            @RequestParam(value = "tipo-imovel", required = false) TipoImovelEnum tipoImovel,
+            @RequestParam(value = "cidade", required = false) String cidade,
+            @RequestParam(value = "bairro", required = false) String bairro,
+            @RequestParam(value = "corretor-responsavel-id", required = false) UUID corretorResponsavelId,
+            @RequestParam(value = "data-cadastro-inicial", required = false) LocalDate dataCadastroInicial,
+            @RequestParam(value = "data-cadastro-final", required = false) LocalDate dataCadastroFinal,
+            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+            @RequestParam(value = "tamanho", defaultValue = "10") Integer tamanho
+    ) {
+        Page<ImovelFindResponseDTO> resultado = imovelService.listarTodosImoveis(
+                titulo, valorMinimo, valorMaximo, finalidadeImovel, tipoImovel, cidade,
+                bairro, corretorResponsavelId, dataCadastroInicial, dataCadastroFinal, pagina, tamanho
+        );
+        return ResponseEntity.ok(resultado);
+    }
+
+    @GetMapping("/meus")
+    public ResponseEntity<Page<ImovelFindResponseDTO>> pesquisaMeusImoveis(
+            @RequestParam(value = "titulo", required = false) String titulo,
+            @RequestParam(value = "valor-minimo", required = false) BigDecimal valorMinimo,
+            @RequestParam(value = "valor-maximo", required = false) BigDecimal valorMaximo,
+            @RequestParam(value = "finalidade-imovel", required = false) FinalidadeImovelEnum finalidadeImovel,
+            @RequestParam(value = "compartilhamento-imovel", required = false) CompartilhamentoImovelEnum compartilhamentoImovel,
             @RequestParam(value = "tipo-imovel", required = false) TipoImovelEnum tipoImovel,
             @RequestParam(value = "cidade", required = false) String cidade,
             @RequestParam(value = "bairro", required = false) String bairro,
@@ -84,8 +98,8 @@ public class ImovelController {
             @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
             @RequestParam(value = "tamanho", defaultValue = "10") Integer tamanho
     ) {
-        Page<ImovelFindResponseDTO> resultado = imovelService.pesquisaImovel(
-                titulo, valorMinimo, valorMaximo, finalidadeImovel, tipoImovel, cidade, bairro,
+        Page<ImovelFindResponseDTO> resultado = imovelService.pesquisaMeusImoveis(
+                titulo, valorMinimo, valorMaximo, finalidadeImovel, compartilhamentoImovel, tipoImovel, cidade, bairro,
                 statusImovel, dataCadastroInicial, dataCadastroFinal, pagina, tamanho
         );
         return ResponseEntity.ok(resultado);

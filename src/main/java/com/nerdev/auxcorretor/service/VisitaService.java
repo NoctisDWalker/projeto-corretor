@@ -1,10 +1,11 @@
 package com.nerdev.auxcorretor.service;
 
 import com.nerdev.auxcorretor.dto.visita.*;
-import com.nerdev.auxcorretor.exception.BusinessException;
+import com.nerdev.auxcorretor.exception.NotFoundException;
 import com.nerdev.auxcorretor.mapper.HistoricoVisitaMapper;
 import com.nerdev.auxcorretor.mapper.VisitaMapper;
 import com.nerdev.auxcorretor.model.Atendimento;
+import com.nerdev.auxcorretor.model.Corretor;
 import com.nerdev.auxcorretor.model.Imovel;
 import com.nerdev.auxcorretor.model.Visita;
 import com.nerdev.auxcorretor.model.enums.InteresseClienteEnum;
@@ -15,7 +16,9 @@ import com.nerdev.auxcorretor.repository.ImovelRepository;
 import com.nerdev.auxcorretor.repository.VisitaRepository;
 import com.nerdev.auxcorretor.repository.specs.SpecificationBuilder;
 import com.nerdev.auxcorretor.repository.specs.VisitaSpecs;
+import com.nerdev.auxcorretor.validation.ImovelValidator;
 import com.nerdev.auxcorretor.validation.VisitaValidator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,38 +36,36 @@ import java.util.UUID;
 public class VisitaService {
 
     private final VisitaMapper visitaMapper;
+    private final HistoricoVisitaMapper historicoVisitaMapper;
     private final VisitaValidator visitaValidator;
+    private final ImovelValidator imovelValidator;
     private final VisitaRepository visitaRepository;
     private final ImovelRepository imovelRepository;
     private final AtendimentoRepository atendimentoRepository;
     private final HistoricoVisitaService historicoVisitaService;
-    private final HistoricoVisitaMapper historicoVisitaMapper;
+    private final ServiceUtils serviceUtils;
 
+    @Transactional
     public VisitaResponseDTO salvar(UUID idAtendimento, VisitaCreateRequestDTO createDto) {
-        Atendimento atendimentoEncontrado = atendimentoRepository.findById(idAtendimento)
-                .orElseThrow(() -> new BusinessException("Atendimento não encontrado"));
-        Imovel imovelEncontrado = imovelRepository.findById(createDto.idImovel())
-                .orElseThrow(() -> new BusinessException("Imovel não encontrado"));
+        Atendimento atendimentoEncontrado = getAtendimento(idAtendimento);
+        Imovel imovelEncontrado = getImovel(createDto);
 
         Visita visitaCriada = visitaMapper.toEntity(createDto);
         prepararNovaVisita(visitaCriada, atendimentoEncontrado, imovelEncontrado);
 
         visitaValidator.validaCadastro(visitaCriada, atendimentoEncontrado);
         Visita visitaSalva = visitaRepository.save(visitaCriada);
-        imovelRepository.imcrementarVisitas(atendimentoEncontrado.getId());
+        imovelRepository.imcrementarVisitas(imovelEncontrado.getId());
         historicoVisitaService.criarHistoricoAutomatico(visitaSalva, "Visita criada.");
 
         return visitaMapper.toDTO(visitaSalva);
     }
 
     public VisitaResponseDTO atualizar(UUID idVisita, VisitaUpdateRequestDTO updateDto, UUID idAtendimento) {
-        Atendimento atendimentoEncontrado = atendimentoRepository.findById(idAtendimento)
-                .orElseThrow(() -> new BusinessException("Atendimento não encontrado"));
-        Visita visitaPersistida = visitaRepository.findById(idVisita)
-                .orElseThrow(() -> new BusinessException("Visita não encontrada"));
+        Atendimento atendimentoEncontrado = getAtendimento(idAtendimento);
+        Visita visitaPersistida = getVisita(idVisita);
 
         StatusVisitaEnum statusAntigo = visitaPersistida.getStatusVisita();
-
         validaRelacionamentoVisitaAtendimento(atendimentoEncontrado, visitaPersistida);
 
         Visita visitaAtualizada = visitaMapper.cloneEntity(updateDto);
@@ -74,37 +75,31 @@ public class VisitaService {
         visitaMapper.updateEntity(visitaPersistida, updateDto);
 
         Visita atualizada = visitaRepository.save(visitaPersistida);
-
         StatusVisitaEnum statusNovo = atualizada.getStatusVisita();
 
         if (statusAntigo != statusNovo) {
             historicoVisitaService.criarHistoricoAutomatico(atualizada, mensagemHistorico(statusNovo));
         }
-
         return visitaMapper.toDTO(atualizada);
     }
 
-    public void cancelar(UUID id, UUID idAtendimento) {
-        Visita visitaEncontrada = visitaRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Visita não encontrada"));
-        Atendimento atendimentoEncontrado = atendimentoRepository.findById(idAtendimento)
-                .orElseThrow(() -> new BusinessException("Atendimento não encontrado"));
+    public void cancelar(UUID idVisita, UUID idAtendimento) {
+        Atendimento atendimentoEncontrado = getAtendimento(idAtendimento);
+        Visita visitaEncontrada = getVisita(idVisita);
 
         validaRelacionamentoVisitaAtendimento(atendimentoEncontrado, visitaEncontrada);
         visitaValidator.validaCancelar(visitaEncontrada);
         visitaEncontrada.setStatusVisita(StatusVisitaEnum.CANCELADA);
 
         Visita visitaCancelada = visitaRepository.save(visitaEncontrada);
-        imovelRepository.decrementarVisitas(atendimentoEncontrado.getId());
+        imovelRepository.decrementarVisitas(visitaEncontrada.getImovel().getId());
         historicoVisitaService.criarHistoricoAutomatico(visitaCancelada, mensagemHistorico(visitaCancelada.getStatusVisita()));
     }
 
     // Todo: possivelmente excluir este metodo
-    public void reativarVisita(UUID id, UUID idAtendimento) {
-        Visita visitaEncontrada = visitaRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Visita não encontrada"));
-        Atendimento atendimentoEncontrado = atendimentoRepository.findById(idAtendimento)
-                .orElseThrow(() -> new BusinessException("Atendimento não encontrado"));
+    public void reativarVisita(UUID idVisita, UUID idAtendimento) {
+        Atendimento atendimentoEncontrado = getAtendimento(idAtendimento);
+        Visita visitaEncontrada = getVisita(idVisita);
 
         validaRelacionamentoVisitaAtendimento(atendimentoEncontrado, visitaEncontrada);
         visitaValidator.validaReativar(visitaEncontrada);
@@ -115,26 +110,17 @@ public class VisitaService {
     }
 
     public void adicionarHistoricoManual(UUID idVisita, UUID idAtendimento, String descricao) {
-        Visita visitaEncontrada = visitaRepository.findById(idVisita)
-                .orElseThrow(() -> new BusinessException("Visita não encontrada"));
-        Atendimento atendimentoEncontrado = atendimentoRepository.findById(idAtendimento)
-                .orElseThrow(() -> new BusinessException("Atendimento não encontrado"));
-
+        Visita visitaEncontrada = getVisita(idVisita);
+        Atendimento atendimentoEncontrado = getAtendimento(idAtendimento);
         validaRelacionamentoVisitaAtendimento(atendimentoEncontrado, visitaEncontrada);
-
         historicoVisitaService.criarHistoricoManual(visitaEncontrada, descricao);
     }
 
-    public List<HistoricoVisitaResponseDTO> buscarTimeLineVisita(UUID idVisita, UUID idAtendimento){
-        Visita visitaEncontrada = visitaRepository.findById(idVisita)
-                .orElseThrow(() -> new BusinessException("Visita não encontrada"));
-        Atendimento atendimentoEncontrado = atendimentoRepository.findById(idAtendimento)
-                .orElseThrow(() -> new BusinessException("Atendimento não encontrado"));
-
+    public List<HistoricoVisitaResponseDTO> buscarTimeLineVisita(UUID idVisita, UUID idAtendimento) {
+        Visita visitaEncontrada = getVisita(idVisita);
+        Atendimento atendimentoEncontrado = getAtendimento(idAtendimento);
         validaRelacionamentoVisitaAtendimento(atendimentoEncontrado, visitaEncontrada);
-
         List<HistoricoVisita> historicos = visitaEncontrada.getHistoricos();
-
         return historicoVisitaMapper.toDtoList(historicos);
     }
 
@@ -151,9 +137,13 @@ public class VisitaService {
             LocalDate maiorDataCadastro,
             Integer pagina,
             Integer tamanho
-    ){
+    ) {
+
+        Corretor corretorEncontrado = getCorretor();
+
         Specification<Visita> spec = new SpecificationBuilder<Visita>()
                 .and(idAtendimento, VisitaSpecs::idAtendimentoEquals)
+                .and(corretorEncontrado.getId(), VisitaSpecs::idCorretorResponsavelEquals)
                 .and(idImovel, VisitaSpecs::idImovelEquals)
                 .and(menorDataAgendada, VisitaSpecs::menorDataAgendada)
                 .and(maiorDataAgendada, VisitaSpecs::maiorDataAgendada)
@@ -167,7 +157,7 @@ public class VisitaService {
 
         Pageable pageable = PageRequest.of(pagina, tamanho, Sort.by("dataHoraAgendada").descending());
         Page<Visita> page = visitaRepository.findAll(spec, pageable);
-        return  page.map(visitaMapper::toFindDTO);
+        return page.map(visitaMapper::toFindDTO);
     }
 
     private void prepararNovaVisita(Visita visitaCriada, Atendimento atendimentoEncontrado, Imovel imovelEncontrado) {
@@ -184,9 +174,34 @@ public class VisitaService {
 
     private void validaRelacionamentoVisitaAtendimento(Atendimento atendimento, Visita visita) {
         if (!atendimento.getId().equals(visita.getAtendimento().getId())) {
-            throw new BusinessException("Visita não pertence ao atendimento informado.");
+            throw new NotFoundException("Visita não pertence ao atendimento informado.");
         }
     }
+
+    private Corretor getCorretor() {
+        return serviceUtils.obterCorretorLogado();
+    }
+
+    private Atendimento getAtendimento(UUID idAtendimento) {
+        Corretor corretorLogado = getCorretor();
+        return atendimentoRepository.findByIdAndCorretorId(idAtendimento, corretorLogado.getId())
+                .orElseThrow(() -> new NotFoundException("Atendimento não encontrado"));
+    }
+
+    private Visita getVisita(UUID idVisita) {
+        return visitaRepository.findById(idVisita)
+                .orElseThrow(() -> new NotFoundException("Visita não encontrada"));
+    }
+
+    private Imovel getImovel(VisitaCreateRequestDTO createDto) {
+        Corretor corretorLogado = getCorretor();
+        Imovel imovelEncontrado = imovelRepository.findById(createDto.idImovel())
+                .orElseThrow(() -> new NotFoundException("Imovel não encontrado"));
+
+        imovelValidator.validaVisibilidade(imovelEncontrado,  corretorLogado.getId());
+        return imovelEncontrado;
+    }
+
 
     private String mensagemHistorico(StatusVisitaEnum status) {
 

@@ -1,5 +1,6 @@
 package com.nerdev.auxcorretor.dto.imovel;
 
+import com.nerdev.auxcorretor.model.enums.CompartilhamentoImovelEnum;
 import com.nerdev.auxcorretor.model.enums.FinalidadeImovelEnum;
 import com.nerdev.auxcorretor.model.enums.TipoImovelEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,6 +16,7 @@ public record ImovelCreateRequestDTO(
         @NotNull BigDecimal valor,
         @NotNull FinalidadeImovelEnum finalidadeImovel,
         @NotNull TipoImovelEnum tipoImovel,
+        CompartilhamentoImovelEnum compartilhamentoImovel,
         String cidade,
         String bairro
 ) {

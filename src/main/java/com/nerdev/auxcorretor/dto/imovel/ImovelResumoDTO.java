@@ -1,5 +1,6 @@
 package com.nerdev.auxcorretor.dto.imovel;
 
+import com.nerdev.auxcorretor.model.enums.CompartilhamentoImovelEnum;
 import com.nerdev.auxcorretor.model.enums.FinalidadeImovelEnum;
 import com.nerdev.auxcorretor.model.enums.StatusImovelEnum;
 import com.nerdev.auxcorretor.model.enums.TipoImovelEnum;
@@ -16,6 +17,7 @@ public record ImovelResumoDTO(
         BigDecimal valor,
         FinalidadeImovelEnum finalidadeImovel,
         TipoImovelEnum tipoImovel,
-        StatusImovelEnum statusImovel
+        StatusImovelEnum statusImovel,
+        CompartilhamentoImovelEnum compartilhamentoImovel
 ) {
 }
