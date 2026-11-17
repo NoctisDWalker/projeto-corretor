@@ -1,5 +1,6 @@
 package com.nerdev.auxcorretor.controller;
 
+import com.nerdev.auxcorretor.controller.docs.ImoveisDoc;
 import com.nerdev.auxcorretor.dto.imovel.ImovelCreateRequestDTO;
 import com.nerdev.auxcorretor.dto.imovel.ImovelFindResponseDTO;
 import com.nerdev.auxcorretor.dto.imovel.ImovelResponseDTO;
@@ -8,6 +9,7 @@ import com.nerdev.auxcorretor.model.enums.CompartilhamentoImovelEnum;
 import com.nerdev.auxcorretor.model.enums.FinalidadeImovelEnum;
 import com.nerdev.auxcorretor.model.enums.StatusImovelEnum;
 import com.nerdev.auxcorretor.model.enums.TipoImovelEnum;
+import com.nerdev.auxcorretor.security.annotations.permissions.imoveis.*;
 import com.nerdev.auxcorretor.service.ImovelService;
 import com.nerdev.auxcorretor.web.util.RestLocationBuilder;
 import jakarta.validation.Valid;
@@ -19,48 +21,59 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/imoveis")
 @RequiredArgsConstructor
-public class ImovelController {
+public class ImovelController implements ImoveisDoc {
 
     private final ImovelService imovelService;
     private final RestLocationBuilder restLocationBuilder;
 
+    @Override
     @PostMapping
+    @PodeCadastrarImoveis
     public ResponseEntity<ImovelResponseDTO> salvar(@RequestBody @Valid ImovelCreateRequestDTO createDTO) {
         ImovelResponseDTO salvo = imovelService.salvar(createDTO);
         URI location = restLocationBuilder.build(salvo.id());
         return ResponseEntity.created(location).body(salvo);
     }
 
+    @Override
     @PutMapping("/{id}")
+    @PodeAtualizarImoveis
     public ResponseEntity<ImovelResponseDTO> atualizar(@PathVariable UUID id, @RequestBody @Valid ImovelUpdateRequestDTO updateDTO) {
         ImovelResponseDTO atualizado = imovelService.atualizar(id, updateDTO);
         return ResponseEntity.ok(atualizado);
     }
 
+    @Override
     @DeleteMapping("/{id}")
+    @PodeDeletarImoveis
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         imovelService.inativar(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Override
     @PatchMapping("/{id}/reativar")
+    @PodeReativarImoveis
     public ResponseEntity<Void> reativar(@PathVariable UUID id) {
         imovelService.reativar(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Override
     @GetMapping("/{id}")
+    @PodeBuscarImovelPorId
     public ImovelResponseDTO buscarPorId(@PathVariable UUID id) {
         return imovelService.buscarPorId(id);
     }
 
+    @Override
     @GetMapping("/todos")
+    @PodeBuscarTodosOsImoveis
     public ResponseEntity<Page<ImovelFindResponseDTO>> todos(
             @RequestParam(value = "titulo", required = false) String titulo,
             @RequestParam(value = "valor-minimo", required = false) BigDecimal valorMinimo,
@@ -82,7 +95,9 @@ public class ImovelController {
         return ResponseEntity.ok(resultado);
     }
 
+    @Override
     @GetMapping("/meus")
+    @PodeBuscarMeusImoveis
     public ResponseEntity<Page<ImovelFindResponseDTO>> pesquisaMeusImoveis(
             @RequestParam(value = "titulo", required = false) String titulo,
             @RequestParam(value = "valor-minimo", required = false) BigDecimal valorMinimo,

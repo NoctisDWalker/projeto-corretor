@@ -1,10 +1,12 @@
 package com.nerdev.auxcorretor.controller;
 
+import com.nerdev.auxcorretor.controller.docs.AtendimentosDoc;
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoCreateRequestDTO;
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoFindResponseDTO;
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoResponseDTO;
 import com.nerdev.auxcorretor.dto.atendimento.AtendimentoUpdateRequestDTO;
 import com.nerdev.auxcorretor.model.enums.StatusAtendimentoEnum;
+import com.nerdev.auxcorretor.security.annotations.permissions.atendimentos.*;
 import com.nerdev.auxcorretor.service.AtendimentoService;
 import com.nerdev.auxcorretor.web.util.RestLocationBuilder;
 import jakarta.validation.Valid;
@@ -20,37 +22,47 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/atendimentos")
 @RequiredArgsConstructor
-public class AtendimentoController {
+public class AtendimentoController implements AtendimentosDoc {
 
     private final AtendimentoService atendimentoService;
     private final RestLocationBuilder locationBuilder;
 
+    @Override
     @PostMapping
+    @PodeCadastrarAtendimento
     public ResponseEntity<AtendimentoResponseDTO> salvar(@RequestBody @Valid AtendimentoCreateRequestDTO dto) {
         AtendimentoResponseDTO salvo = atendimentoService.salvar(dto);
         URI location = locationBuilder.build(salvo.id());
         return ResponseEntity.created(location).body(salvo);
     }
 
+    @Override
     @PutMapping("/{id}")
+    @PodeAtualizarAtendimento
     public ResponseEntity<AtendimentoResponseDTO> atualizar(@PathVariable UUID id, @RequestBody @Valid AtendimentoUpdateRequestDTO dto) {
         AtendimentoResponseDTO atualizado = atendimentoService.atualizar(id, dto);
         return ResponseEntity.ok(atualizado);
     }
 
+    @Override
     @DeleteMapping("/{id}")
+    @PodeDeletarAtendimento
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         atendimentoService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Override
     @GetMapping("/{id}")
+    @PodeBuscarAtendimentoPorId
     public ResponseEntity<AtendimentoResponseDTO> buscarPorId(@PathVariable UUID id) {
         AtendimentoResponseDTO atendimentoResponseDTO = atendimentoService.buscarPorId(id);
         return ResponseEntity.ok(atendimentoResponseDTO);
     }
 
+    @Override
     @GetMapping("/pesquisa")
+    @PodePesquisarAtendimento
     public ResponseEntity<Page<AtendimentoFindResponseDTO>> pesquisaAtendimentos(
             @RequestParam(value = "id-cliente", required = false) UUID idCliente,
             @RequestParam(value = "status-atendimento", required = false) StatusAtendimentoEnum statusAtendimento,
