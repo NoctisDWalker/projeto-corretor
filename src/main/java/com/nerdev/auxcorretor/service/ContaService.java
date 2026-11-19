@@ -4,12 +4,11 @@ import com.nerdev.auxcorretor.dto.conta.ContaCreateRequestDTO;
 import com.nerdev.auxcorretor.dto.conta.ContaResponseDTO;
 import com.nerdev.auxcorretor.dto.conta.ContaUpdateRequestDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
+import com.nerdev.auxcorretor.exception.NotFoundException;
 import com.nerdev.auxcorretor.mapper.ContaMapper;
 import com.nerdev.auxcorretor.model.Conta;
-import com.nerdev.auxcorretor.model.CorretorConta;
 import com.nerdev.auxcorretor.model.enums.StatusContaEnum;
 import com.nerdev.auxcorretor.repository.ContaRepository;
-import com.nerdev.auxcorretor.repository.CorretorContaRepository;
 import com.nerdev.auxcorretor.validation.ContaValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,9 +24,9 @@ public class ContaService {
     private final ContaMapper contaMapper;
     private final ContaValidator contaValidator;
     private final ContaRepository contaRepository;
+    private final ServiceUtils serviceUtils;
 
     public ContaResponseDTO criarConta(ContaCreateRequestDTO createDto) {
-
         Conta entity = contaMapper.toEntity(createDto);
         contaValidator.validaCadastro(entity);
 
@@ -39,8 +38,7 @@ public class ContaService {
     }
 
     public ContaResponseDTO atualizar(UUID contaId, ContaUpdateRequestDTO updateDto) {
-        Conta contaEncontrada = contaRepository.findById(contaId)
-                .orElseThrow(() -> new BusinessException("Conta não encontrada"));
+        Conta contaEncontrada = buscaContaNoEscopo(contaId);
 
         contaValidator.validarContaOperacional(contaEncontrada);
         contaMapper.updateEntity(updateDto, contaEncontrada);
@@ -50,10 +48,9 @@ public class ContaService {
         return contaMapper.toDto(salva);
     }
 
-
     public void inativar(UUID contaId, StatusContaEnum statusConta) {
         Conta contaEncontrada = contaRepository.findById(contaId)
-                .orElseThrow(() -> new BusinessException("Conta inexistente"));
+                .orElseThrow(() -> new NotFoundException("Conta não encontrada."));
 
         contaValidator.validaSuspenderOuInativar(contaEncontrada);
         contaEncontrada.setStatusConta(statusConta);
@@ -70,4 +67,17 @@ public class ContaService {
         // Todo: Definir posteriormente regra para data de expiração
         return LocalDateTime.now().plusDays(30);
     }
+
+    private Conta getContaLogado() {
+        return serviceUtils.obterContaLogado();
+    }
+
+    private Conta buscaContaNoEscopo(UUID contaId) {
+        Conta contaLogada = getContaLogado();
+        if (contaId.equals(contaLogada.getId())) {
+            return contaLogada;
+        }
+        throw new NotFoundException("Conta não encontrado!");
+    }
+
 }

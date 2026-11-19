@@ -11,6 +11,10 @@ public class CorretorSpecs {
         return (root, query, cb) -> cb.equal(root.get("id"), id);
     }
 
+    public static Specification<Corretor> contaIdEqual(UUID contaId) {
+        return (root, query, cb) -> cb.equal(root.get("usuario").get("conta").get("id"), contaId);
+    }
+
     public static Specification<Corretor> nomeLike(String nome) {
         return (root, query, cb) -> cb.like(cb.upper(root.get("nome")), "%" + nome.toUpperCase() + "%");
 

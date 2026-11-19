@@ -2,18 +2,22 @@ package com.nerdev.auxcorretor.validation;
 
 import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.exception.DuplicateEntityException;
+import com.nerdev.auxcorretor.exception.NotFoundException;
 import com.nerdev.auxcorretor.model.Corretor;
+import com.nerdev.auxcorretor.repository.CorretorContaRepository;
 import com.nerdev.auxcorretor.repository.CorretorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class CorretorValidator {
 
     private final CorretorRepository corretorRepository;
+    private final CorretorContaRepository corretorContaRepository;
 
     public void validarAtualizar(Corretor corretor) {
         validarCorretorAtivo(corretor.isAtivo());
@@ -22,6 +26,13 @@ public class CorretorValidator {
 
     public void validarDeletar(Corretor corretor) {
         validarCorretorAtivo(corretor.isAtivo());
+    }
+
+    public void validaPertencimentoDoCorretorAlvo(UUID corretorId, UUID contaId) {
+        boolean pertencimento = corretorContaRepository.existsByCorretorIdAndContaIdAndDeletedAtIsNull(corretorId, contaId);
+        if (!pertencimento) {
+            throw new NotFoundException("Corretor não encontrado.");
+        }
     }
 
     private void verificarCreciUnico(Corretor corretor){

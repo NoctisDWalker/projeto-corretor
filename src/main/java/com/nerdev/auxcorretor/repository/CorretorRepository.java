@@ -3,6 +3,7 @@ package com.nerdev.auxcorretor.repository;
 import com.nerdev.auxcorretor.model.Corretor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface CorretorRepository extends JpaRepository<Corretor, UUID>, JpaSp
     Optional<Corretor> findByUsuarioId(UUID usuarioId);
     boolean existsByCreci(String cresci);
     boolean existsByCpf(String cpf);
+
+    List<Corretor> findAllByUsuarioContaIdAndUsuarioDeletedAtIsNull(UUID usuarioId);
 }

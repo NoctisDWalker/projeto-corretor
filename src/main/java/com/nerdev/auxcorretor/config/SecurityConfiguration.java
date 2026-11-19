@@ -44,7 +44,6 @@ public class SecurityConfiguration {
                                     "/").permitAll()
                             .requestMatchers("/clientes/**", "/imoveis/**", "/atendimentos/**").authenticated()
                             .anyRequest()
-                            // /corretores e /contas ficam negados de propósito até terem checagem de dono.
                             .denyAll();
                 })
                 .cors(Customizer.withDefaults())
