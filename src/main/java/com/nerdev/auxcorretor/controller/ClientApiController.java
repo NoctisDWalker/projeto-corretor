@@ -1,5 +1,6 @@
 package com.nerdev.auxcorretor.controller;
 
+import com.nerdev.auxcorretor.controller.docs.ClientApiDoc;
 import com.nerdev.auxcorretor.dto.ClientApi.ClientApiRequestDTO;
 import com.nerdev.auxcorretor.dto.ClientApi.ClientApiResponseDTO;
 import com.nerdev.auxcorretor.service.ClientApiService;
@@ -16,13 +17,14 @@ import java.net.URI;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth/clients")
-public class ClientApiController {
+public class ClientApiController implements ClientApiDoc {
 
     private final ClientApiService clientApiService;
     private final RestLocationBuilder restLocationBuilder;
 
+    @Override
     @PostMapping
-    public ResponseEntity<ClientApiResponseDTO> save(@RequestBody ClientApiRequestDTO dto) {
+    public ResponseEntity<ClientApiResponseDTO> Cadastrar(@RequestBody ClientApiRequestDTO dto) {
         ClientApiResponseDTO salvo = clientApiService.save(dto);
         URI location = restLocationBuilder.build(salvo.id());
         return ResponseEntity.created(location).body(salvo);

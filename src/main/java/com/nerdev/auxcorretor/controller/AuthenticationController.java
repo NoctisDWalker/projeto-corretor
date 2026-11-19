@@ -1,8 +1,10 @@
 package com.nerdev.auxcorretor.controller;
 
+import com.nerdev.auxcorretor.controller.docs.AuthenticationDoc;
 import com.nerdev.auxcorretor.dto.auth.RegistrarCorretorRequestDTO;
 import com.nerdev.auxcorretor.dto.auth.RegistrarCorretorResponseDTO;
 import com.nerdev.auxcorretor.model.enums.ProviderTypeEnum;
+import com.nerdev.auxcorretor.security.annotations.permissions.authentication.PodeCadastrarCorretorIndividual;
 import com.nerdev.auxcorretor.service.AuthService;
 import com.nerdev.auxcorretor.web.util.RestLocationBuilder;
 import jakarta.validation.Valid;
@@ -18,14 +20,15 @@ import java.net.URI;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-public class AuthenticationController {
+public class AuthenticationController implements AuthenticationDoc {
 
     private final AuthService authService;
     private final RestLocationBuilder restLocationBuilder;
 
-
+    @Override
     @PostMapping("/registrar/corretor")
-    public ResponseEntity<RegistrarCorretorResponseDTO> registrarCorretorPadrao(
+    @PodeCadastrarCorretorIndividual
+    public ResponseEntity<RegistrarCorretorResponseDTO> registrarCorretorIndividual(
             @RequestBody @Valid RegistrarCorretorRequestDTO registrarDto) {
         ProviderTypeEnum providerType = ProviderTypeEnum.LOGIN_LOCAL;
         RegistrarCorretorResponseDTO corretorRegistradoDto =
