@@ -42,7 +42,12 @@ public class SecurityConfiguration {
                                     "/v3/api-docs/**",
                                     "/swagger-ui.html", // Todo: Restringir por perfil do Spring (dev) quando for para produção
                                     "/").permitAll()
-                            .requestMatchers("/clientes/**", "/imoveis/**", "/atendimentos/**").authenticated()
+                            .requestMatchers(
+                                    "/clientes/**",
+                                    "/imoveis/**",
+                                    "/atendimentos/**",
+                                    "/corretores/**",
+                                    "/contas/**").authenticated()
                             .anyRequest()
                             .denyAll();
                 })

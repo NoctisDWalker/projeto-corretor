@@ -3,6 +3,7 @@ package com.nerdev.auxcorretor.controller;
 import com.nerdev.auxcorretor.controller.docs.ClientApiDoc;
 import com.nerdev.auxcorretor.dto.ClientApi.ClientApiRequestDTO;
 import com.nerdev.auxcorretor.dto.ClientApi.ClientApiResponseDTO;
+import com.nerdev.auxcorretor.security.annotations.permissions.clientapi.PodeCadastrarClientApi;
 import com.nerdev.auxcorretor.service.ClientApiService;
 import com.nerdev.auxcorretor.web.util.RestLocationBuilder;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class ClientApiController implements ClientApiDoc {
 
     @Override
     @PostMapping
+    @PodeCadastrarClientApi
     public ResponseEntity<ClientApiResponseDTO> Cadastrar(@RequestBody ClientApiRequestDTO dto) {
         ClientApiResponseDTO salvo = clientApiService.save(dto);
         URI location = restLocationBuilder.build(salvo.id());

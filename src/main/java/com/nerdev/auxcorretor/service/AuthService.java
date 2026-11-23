@@ -4,7 +4,6 @@ import com.nerdev.auxcorretor.dto.auth.RegistrarCorretorRequestDTO;
 import com.nerdev.auxcorretor.dto.auth.RegistrarCorretorResponseDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.model.*;
-import com.nerdev.auxcorretor.model.enums.PapelCorretorContaEnum;
 import com.nerdev.auxcorretor.model.enums.PerfilUsuarioEnum;
 import com.nerdev.auxcorretor.model.enums.ProviderTypeEnum;
 import com.nerdev.auxcorretor.repository.*;
@@ -72,7 +71,6 @@ public class AuthService {
         return CorretorConta.builder()
                 .corretor(corretor)
                 .conta(conta)
-                .papel(PapelCorretorContaEnum.CORRETOR)
                 .emailProfissional(dto.email())
                 .build();
     }

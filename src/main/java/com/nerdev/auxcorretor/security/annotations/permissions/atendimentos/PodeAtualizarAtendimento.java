@@ -7,6 +7,6 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@PreAuthorize("hasAnyRole('CORRETOR_INDIVIDUAL', 'IMOBILIARIA', 'CORRETOR_VINCULADO', 'GERENTE', 'ADMIN')")
+@PreAuthorize("hasAnyRole('CORRETOR_INDIVIDUAL', 'CORRETOR_VINCULADO', 'GERENTE', 'ADMIN')")
 public @interface PodeAtualizarAtendimento {
 }

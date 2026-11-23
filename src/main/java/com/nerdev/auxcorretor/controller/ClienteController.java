@@ -6,10 +6,7 @@ import com.nerdev.auxcorretor.dto.cliente.ClienteFindResponseDto;
 import com.nerdev.auxcorretor.dto.cliente.ClienteResponseDTO;
 import com.nerdev.auxcorretor.dto.cliente.ClienteUpdateRequestDTO;
 import com.nerdev.auxcorretor.model.enums.StatusClienteEnum;
-import com.nerdev.auxcorretor.security.annotations.permissions.clientes.PodeAtualizarCliente;
-import com.nerdev.auxcorretor.security.annotations.permissions.clientes.PodeCadastrarCliente;
-import com.nerdev.auxcorretor.security.annotations.permissions.clientes.PodeDeletarCliente;
-import com.nerdev.auxcorretor.security.annotations.permissions.clientes.PodeReativarCliente;
+import com.nerdev.auxcorretor.security.annotations.permissions.clientes.*;
 import com.nerdev.auxcorretor.service.ClienteService;
 import com.nerdev.auxcorretor.web.util.RestLocationBuilder;
 import jakarta.validation.Valid;
@@ -68,7 +65,7 @@ public class ClienteController implements ClientesDoc {
 
     @Override
     @GetMapping("/pesquisa")
-    @PodeAtualizarCliente
+    @PodePesquisarCliente
     public ResponseEntity<Page<ClienteFindResponseDto>> pesquisaCliente(
             @RequestParam(value = "nome", required = false) String nome,
             @RequestParam(value = "cpf", required = false) String cpf,

@@ -1,6 +1,5 @@
 package com.nerdev.auxcorretor.model;
 
-import com.nerdev.auxcorretor.model.enums.PapelCorretorContaEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -31,12 +30,6 @@ public class CorretorConta {
     @JoinColumn(name = "conta_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Conta conta;
-
-    @JoinColumn
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private PapelCorretorContaEnum papel;
 
     @Column(nullable = false)
     private String emailProfissional;
