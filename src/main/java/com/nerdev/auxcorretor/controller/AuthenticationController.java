@@ -32,8 +32,8 @@ public class AuthenticationController implements AuthenticationDoc {
             @RequestBody @Valid RegistrarCorretorRequestDTO registrarDto) {
         ProviderTypeEnum providerType = ProviderTypeEnum.LOGIN_LOCAL;
         RegistrarCorretorResponseDTO corretorRegistradoDto =
-                authService.registrarCorretor(registrarDto, providerType);
-        URI location = restLocationBuilder.build(corretorRegistradoDto.usuarioId());
+                authService.registrarCorretorIndividual(registrarDto);
+        URI location = restLocationBuilder.build(corretorRegistradoDto.credencialUsuario().id());
 
         return ResponseEntity.created(location).body(corretorRegistradoDto);
     }

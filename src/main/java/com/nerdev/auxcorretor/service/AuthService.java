@@ -1,8 +1,13 @@
 package com.nerdev.auxcorretor.service;
 
-import com.nerdev.auxcorretor.dto.auth.RegistrarCorretorRequestDTO;
-import com.nerdev.auxcorretor.dto.auth.RegistrarCorretorResponseDTO;
+import com.nerdev.auxcorretor.dto.auth.*;
+import com.nerdev.auxcorretor.dto.conta.ContaCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.conta.ContaResponseDTO;
+import com.nerdev.auxcorretor.dto.corretor.CorretorCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.imobiliaria.ImobiliariaCreateRequestDto;
+import com.nerdev.auxcorretor.dto.imobiliaria.endereco.EnderecoCreateRequestDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
+import com.nerdev.auxcorretor.mapper.AuthMapper;
 import com.nerdev.auxcorretor.model.*;
 import com.nerdev.auxcorretor.model.enums.PerfilUsuarioEnum;
 import com.nerdev.auxcorretor.model.enums.ProviderTypeEnum;
@@ -21,71 +26,117 @@ public class AuthService {
 
     private final PasswordEncoder encoder;
     private final RegistrarCorretorValidator registrarCorretorValidator;
-
-    private final CredencialUsuarioRepository credUserRepository;
     private final ContaRepository contaRepository;
     private final UsuarioRepository usuarioRepository;
     private final CorretorRepository corretorRepository;
     private final CorretorContaRepository corretorContaRepository;
+    private final ImobiliariaRepository imobiliariaRepository;
+    private final ContaService contaService;
+    private final AuthMapper authMapper;
 
 
     @Transactional
-    public RegistrarCorretorResponseDTO registrarCorretor(RegistrarCorretorRequestDTO registrarCorretorRequestDTO, ProviderTypeEnum providerType) {
-        registrarCorretorValidator.validarCadastro(registrarCorretorRequestDTO, providerType);
+    public RegistrarCorretorResponseDTO registrarCorretorIndividual(RegistrarCorretorRequestDTO createRequest) {
 
-        Conta contaExistente = contaRepository.findById(registrarCorretorRequestDTO.contaId())
-                .orElseThrow(() -> new BusinessException("Conta não encontrada."));
+        ContaCreateRequestDTO contaRequest = createRequest.conta();
+        CorretorCreateRequestDTO corretorRequest = createRequest.corretor();
+        UsuarioCredencialRequestDTO userCredResquestDTO = createRequest.credencialUsuario();
 
-        Usuario usuario = criarUsuario(registrarCorretorRequestDTO, contaExistente);
-        Corretor corretor = criarCorretor(registrarCorretorRequestDTO, usuario);
+        ContaResponseDTO contaResponse = contaService.criarConta(contaRequest);
+        Conta conta = contaRepository.getReferenceById(contaResponse.contaId());
 
-        String senhaHash = criptografarSenha(registrarCorretorRequestDTO.senha());
-        CredencialUsuario credencialUsuario = criarCredencial(registrarCorretorRequestDTO, usuario, providerType, senhaHash);
+        Usuario usuario = criarUsuario(userCredResquestDTO.nomeExibicao(), conta, PerfilUsuarioEnum.ROLE_CORRETOR_INDIVIDUAL);
+        String senhaHash = criptografarSenha(userCredResquestDTO.senha());
+        CredencialUsuario credencialUsuario = criarCredencial(
+                userCredResquestDTO.login(),
+                userCredResquestDTO.email(),
+                usuario,
+                ProviderTypeEnum.LOGIN_LOCAL,
+                senhaHash);
         usuario.adicionarCredencial(credencialUsuario);
 
-        CorretorConta corretorConta = criarCorretorConta(registrarCorretorRequestDTO, corretor, contaExistente);
-        contaExistente.adicionarCorretorConta(corretorConta);
+        Corretor corretor = criarCorretor(corretorRequest, usuario);
 
-        salvarRegistro(usuario, corretor, corretorConta);
+        registrarCorretorValidator.validarCadastro(corretor, credencialUsuario, conta);
 
-        return toResponse(registrarCorretorRequestDTO, usuario, corretor, credencialUsuario);
-    }
+        CorretorConta corretorConta = criarCorretorConta(corretor, conta);
+        corretor.setCorretorContas(Set.of(corretorConta));
 
-    private void salvarRegistro(Usuario usuario, Corretor corretor, CorretorConta corretorConta) {
-        usuarioRepository.save(usuario);
         corretorRepository.save(corretor);
+        usuarioRepository.save(usuario);
         corretorContaRepository.save(corretorConta);
+
+        return authMapper.responseCorretor(contaResponse, corretor, usuario);
     }
 
-    private RegistrarCorretorResponseDTO toResponse(RegistrarCorretorRequestDTO dto, Usuario usuario, Corretor corretor, CredencialUsuario credencial) {
-        return new RegistrarCorretorResponseDTO(
-                usuario.getId(),
-                corretor.getId(),
-                usuario.getNomeExibicao(),
-                credencial.getProviderUserId()
-        );
+    @Transactional
+    public RegistrarImobiliariaResponseDTO registrarImobiliaria(RegistrarImobiliariaRequestDTO createRequest) {
+
+        ContaCreateRequestDTO contaRequestDTO = createRequest.conta();
+        ImobiliariaCreateRequestDto imobiliariaRequestDTO = createRequest.imobiliaria();
+        EnderecoCreateRequestDTO enderecoRequestDTO = createRequest.endereco();
+        UsuarioCredencialRequestDTO userCredResquestDTO = createRequest.credencialUsuario();
+
+        ContaResponseDTO contaResponse = contaService.criarConta(contaRequestDTO);
+        Conta conta = contaRepository.getReferenceById(contaResponse.contaId());
+
+        Imobiliaria imobiliaria = criarImobiliaria(imobiliariaRequestDTO, enderecoRequestDTO, conta);
+
+        Usuario usuario = criarUsuario(userCredResquestDTO.nomeExibicao(), conta, PerfilUsuarioEnum.ROLE_IMOBILIARIA);
+        String senhaHash = criptografarSenha(userCredResquestDTO.senha());
+        CredencialUsuario credencialUsuario = criarCredencial(
+                userCredResquestDTO.login(),
+                userCredResquestDTO.email(),
+                usuario,
+                ProviderTypeEnum.LOGIN_LOCAL,
+                senhaHash);
+        usuario.adicionarCredencial(credencialUsuario);
+
+        usuarioRepository.save(usuario);
+        imobiliariaRepository.save(imobiliaria);
+
+        return authMapper.responseImobiliaria(contaResponse, imobiliaria, usuario);
     }
 
+    private Imobiliaria criarImobiliaria(ImobiliariaCreateRequestDto imobiliariaDto, EnderecoCreateRequestDTO enderecoDto, Conta conta) {
+        Endereco endereco = Endereco.builder()
+                .logradouro(enderecoDto.logradouro())
+                .numero(enderecoDto.numero())
+                .complemento(enderecoDto.complemento())
+                .bairro(enderecoDto.bairro())
+                .cidade(enderecoDto.cidade())
+                .uf(enderecoDto.uf())
+                .cep(enderecoDto.cep())
+                .build();
 
-    private CorretorConta criarCorretorConta(RegistrarCorretorRequestDTO dto, Corretor corretor, Conta conta) {
-        return CorretorConta.builder()
-                .corretor(corretor)
+        return Imobiliaria.builder()
                 .conta(conta)
-                .emailProfissional(dto.email())
+                .endereco(endereco)
+                .nomeFantasia(imobiliariaDto.nomeFantasia())
+                .bio(imobiliariaDto.bio())
+                .fotoUrl(imobiliariaDto.fotoUrl())
                 .build();
     }
 
-    private CredencialUsuario criarCredencial(RegistrarCorretorRequestDTO dto, Usuario usuario, ProviderTypeEnum providerType, String senha) {
+    private CorretorConta criarCorretorConta(Corretor corretor, Conta conta) {
+        return CorretorConta.builder()
+                .corretor(corretor)
+                .conta(conta)
+                .emailProfissional(conta.getEmailResponsavel())
+                .build();
+    }
+
+    private CredencialUsuario criarCredencial(String login, String email, Usuario usuario, ProviderTypeEnum providerType, String senha) {
         return CredencialUsuario.builder()
                 .usuario(usuario)
                 .providerType(providerType)
-                .providerUserId(dto.login())
-                .email(dto.email())
+                .providerUserId(login)
+                .email(email)
                 .passwordHash(senha)
                 .build();
     }
 
-    private Corretor criarCorretor(RegistrarCorretorRequestDTO dto, Usuario usuario) {
+    private Corretor criarCorretor(CorretorCreateRequestDTO dto, Usuario usuario) {
         return Corretor.builder()
                 .usuario(usuario)
                 .nome(dto.nome())
@@ -95,14 +146,13 @@ public class AuthService {
                 .build();
     }
 
-    private Usuario criarUsuario(RegistrarCorretorRequestDTO dto, Conta conta) {
+    private Usuario criarUsuario(String nomeExibicao, Conta conta, PerfilUsuarioEnum perfil) {
         return Usuario.builder()
                 .conta(conta)
-                .nomeExibicao(dto.nomeExibicao())
-                .perfilUsuario(Set.of(PerfilUsuarioEnum.ROLE_CORRETOR_INDIVIDUAL))
+                .nomeExibicao(nomeExibicao)
+                .perfilUsuario(Set.of(perfil))
                 .build();
     }
-
 
     private String criptografarSenha(String senha) {
         return encoder.encode(senha);

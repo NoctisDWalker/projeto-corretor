@@ -1,11 +1,11 @@
 package com.nerdev.auxcorretor.dto.auth;
 
-import java.util.UUID;
+import com.nerdev.auxcorretor.dto.conta.ContaResponseDTO;
+import com.nerdev.auxcorretor.dto.corretor.CorretorResponseDTO;
 
 public record RegistrarCorretorResponseDTO(
-        UUID usuarioId,
-        UUID corretorId,
-        String nomeExibicao,
-        String login
+        ContaResponseDTO conta,
+        CorretorResponseDTO corretor,
+        UsuarioCredencialResponseDTO credencialUsuario
 ) {
 }

@@ -1,37 +1,20 @@
 package com.nerdev.auxcorretor.dto.auth;
 
-import jakarta.validation.constraints.NotBlank;
+import com.nerdev.auxcorretor.dto.conta.ContaCreateRequestDTO;
+import com.nerdev.auxcorretor.dto.corretor.CorretorCreateRequestDTO;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.UUID;
 
 public record RegistrarCorretorRequestDTO(
 
-        // Usuario
-        @NotBlank
-        String nomeExibicao,
+        @Valid @NotNull(message = "Os dados da conta são obrigatórios.")
+        ContaCreateRequestDTO conta,
 
-        // Corretor
-        @NotBlank
-        String nome,
-        @NotBlank
-        String bio,
-        @NotBlank
-        String cpf,
-        @NotBlank
-        String creci,
+        @Valid @NotNull(message = "Os dados do corretor são obrigatórios.")
+        CorretorCreateRequestDTO corretor,
 
-        // Conta
-        @NotNull
-        UUID contaId,
-
-        // CredencialUsuario
-        @NotBlank
-        String email,
-        @NotBlank
-        String login,
-        @NotBlank
-        String senha
+        @Valid @NotNull(message = "Os dados de acesso obrigatórios.")
+        UsuarioCredencialRequestDTO credencialUsuario
 
         ) {
 }

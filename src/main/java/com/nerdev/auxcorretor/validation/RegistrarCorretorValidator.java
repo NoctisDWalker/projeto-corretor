@@ -1,8 +1,11 @@
 package com.nerdev.auxcorretor.validation;
 
 import com.nerdev.auxcorretor.dto.auth.RegistrarCorretorRequestDTO;
+import com.nerdev.auxcorretor.dto.corretor.CorretorCreateRequestDTO;
 import com.nerdev.auxcorretor.exception.BusinessException;
 import com.nerdev.auxcorretor.model.Conta;
+import com.nerdev.auxcorretor.model.Corretor;
+import com.nerdev.auxcorretor.model.CredencialUsuario;
 import com.nerdev.auxcorretor.model.enums.ProviderTypeEnum;
 import com.nerdev.auxcorretor.repository.ContaRepository;
 import com.nerdev.auxcorretor.repository.CorretorRepository;
@@ -20,12 +23,12 @@ public class RegistrarCorretorValidator {
     private final CorretorRepository corretorRepository;
     private final CredencialUsuarioRepository credencialUsuarioRepository;
 
-    public void validarCadastro(RegistrarCorretorRequestDTO dto, ProviderTypeEnum providerTypeEnum) {
-        validarLogin(dto.login(), providerTypeEnum);
-        validarConta(dto.contaId());
-        validarEmail(dto.email());
-        validarCpf(dto.cpf());
-        validarCreci(dto.creci());
+    public void validarCadastro(Corretor corretor, CredencialUsuario credencialUsuario, Conta conta) {
+        validarLogin(credencialUsuario.getProviderUserId(), credencialUsuario.getProviderType());
+        validarConta(conta.getId());
+        validarEmail(credencialUsuario.getEmail());
+        validarCpf(corretor.getCpf());
+        validarCreci(corretor.getCreci());
     }
 
     private void validarLogin(String login, ProviderTypeEnum providerTypeEnum) {
